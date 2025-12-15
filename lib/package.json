@@ -33,14 +33,14 @@
   },
   "dependencies": {
     "type-fest": "^4.41.0",
-    "zod": "^4.1.13"
+    "zod": "^4.2.1"
   },
   "devDependencies": {
-    "@vitest/coverage-v8": "^4.0.13",
-    "prettier": "3.6.2",
+    "@vitest/coverage-v8": "^4.0.15",
+    "prettier": "3.7.4",
     "tsup": "^8.5.1",
     "typescript": "5.9.3",
-    "vitest": "4.0.13"
+    "vitest": "4.0.15"
   },
   "files": [
     "dist/*"

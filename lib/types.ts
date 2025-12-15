@@ -195,6 +195,10 @@ export type SzIntersection<
   left: Left;
   right: Right;
 };
+export type SzXor<Options extends [SzType, ...SzType[]] = [SzType]> = {
+  type: "xor";
+  options: Options;
+};
 export type SzTuple<
   Items extends [SzType, ...SzType[]] | [] = [SzType, ...SzType[]] | [],
 > = {
@@ -207,6 +211,14 @@ export type SzRecord<
   Value extends SzType = SzType,
 > = {
   type: "record";
+  key: Key;
+  value: Value;
+};
+export type SzLooseRecord<
+  Key extends SzKey = SzKey,
+  Value extends SzType = SzType,
+> = {
+  type: "looseRecord";
   key: Key;
   value: Value;
 };
@@ -311,8 +323,10 @@ export type SzType = (
   | SzUnion<any>
   | SzDiscriminatedUnion<any, any>
   | SzIntersection<any, any>
+  | SzXor<any>
   | SzTuple<any>
   | SzRecord<any, any>
+  | SzLooseRecord<any, any>
   | SzMap<any, any>
   | SzSet<any>
   | SzEnum<any>
@@ -336,14 +350,18 @@ export type SzUnionize<T extends SzType | SzRef> =
             ? SzUnionize<Options[number]>
             : T extends SzIntersection<infer L, infer R>
               ? SzUnionize<L | R>
-              : T extends SzTuple<infer Items>
-                ? SzUnionize<Items[number]>
-                : T extends SzRecord<infer _Key, infer Value>
-                  ? SzUnionize<Value>
-                  : T extends SzMap<infer _Key, infer Value>
+              : T extends SzXor<infer Options>
+                ? SzUnionize<Options[number]>
+                : T extends SzTuple<infer Items>
+                  ? SzUnionize<Items[number]>
+                  : T extends SzRecord<infer _Key, infer Value>
                     ? SzUnionize<Value>
-                    : T extends SzSet<infer T>
-                      ? SzUnionize<T>
-                      : T extends SzPromise<infer Value>
+                    : T extends SzLooseRecord<infer _Key, infer Value>
+                      ? SzUnionize<Value>
+                      : T extends SzMap<infer _Key, infer Value>
                         ? SzUnionize<Value>
-                        : never);
+                        : T extends SzSet<infer T>
+                          ? SzUnionize<T>
+                          : T extends SzPromise<infer Value>
+                            ? SzUnionize<Value>
+                            : never);

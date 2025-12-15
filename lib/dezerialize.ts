@@ -10,8 +10,10 @@ import {
   SzUnion,
   SzDiscriminatedUnion,
   SzIntersection,
+  SzXor,
   SzTuple,
   SzRecord,
+  SzLooseRecord,
   SzMap,
   SzSet,
   SzEnum,
@@ -147,48 +149,56 @@ export type Dezerialize<T extends SzType | SzRef> = T extends SzRef
                                                         Dezerialize<Key>,
                                                         Dezerialize<Value>
                                                       >
-                                                    : T extends SzMap<
+                                                    : T extends SzLooseRecord<
                                                           infer Key,
                                                           infer Value
                                                         >
-                                                      ? z.ZodMap<
+                                                      ? z.ZodRecord<
                                                           Dezerialize<Key>,
                                                           Dezerialize<Value>
-                                                        > // Enum
-                                                      : T extends SzEnum<
-                                                            infer Values
+                                                        >
+                                                      : T extends SzMap<
+                                                            infer Key,
+                                                            infer Value
                                                           >
-                                                        ? z.ZodEnum<Values> // Union/Intersection
-                                                        : T extends SzUnion<
-                                                              infer _Options
+                                                        ? z.ZodMap<
+                                                            Dezerialize<Key>,
+                                                            Dezerialize<Value>
+                                                          > // Enum
+                                                        : T extends SzEnum<
+                                                              infer Values
                                                             >
-                                                          ? z.ZodUnion<any>
-                                                          : T extends SzDiscriminatedUnion<
-                                                                infer Discriminator,
+                                                          ? z.ZodEnum<Values> // Union/Intersection
+                                                          : T extends SzUnion<
                                                                 infer _Options
                                                               >
-                                                            ? z.ZodDiscriminatedUnion<any>
-                                                            : T extends SzIntersection<
-                                                                  infer L,
-                                                                  infer R
+                                                            ? z.ZodUnion<any>
+                                                            : T extends SzDiscriminatedUnion<
+                                                                  infer Discriminator,
+                                                                  infer _Options
                                                                 >
-                                                              ? z.ZodIntersection<
-                                                                  Dezerialize<L>,
-                                                                  Dezerialize<R>
-                                                                > // Specials
-                                                              : T extends SzPromise<
-                                                                    infer Value
+                                                              ? z.ZodDiscriminatedUnion<any>
+                                                              : T extends SzIntersection<
+                                                                    infer L,
+                                                                    infer R
                                                                   >
-                                                                ? z.ZodPromise<
-                                                                    Dezerialize<Value>
-                                                                  >
-                                                                : T extends SzCatch<
+                                                                ? z.ZodIntersection<
+                                                                    Dezerialize<L>,
+                                                                    Dezerialize<R>
+                                                                  > // Specials
+                                                                : T extends SzPromise<
                                                                       infer Value
                                                                     >
-                                                                  ? z.ZodCatch<
+                                                                  ? z.ZodPromise<
                                                                       Dezerialize<Value>
                                                                     >
-                                                                  : any; // unknown;
+                                                                  : T extends SzCatch<
+                                                                        infer Value
+                                                                      >
+                                                                    ? z.ZodCatch<
+                                                                        Dezerialize<Value>
+                                                                      >
+                                                                    : any; // unknown;
 
 type DezerializersMap = {
   [T in SzType["type"]]: (
@@ -535,6 +545,23 @@ const dezerializers = {
     opts.pathToSchema.set(opts.path, i);
     return getCustomChecks(i, shape, opts);
   }) as any,
+  looseRecord: ((shape: SzLooseRecord, opts: DezerializerOptions) => {
+    const i = z.looseRecord(
+      checkRef(shape.key, opts) ||
+        (d(shape.key, {
+          ...opts,
+          path: opts.path + "/key",
+        }) as z.ZodString | z.ZodNumber | z.ZodSymbol),
+      checkRef(shape.value, opts) ||
+        d(shape.value, {
+          ...opts,
+          path: opts.path + "/value",
+        }),
+      getError(shape, opts),
+    );
+    opts.pathToSchema.set(opts.path, i);
+    return getCustomChecks(i, shape, opts);
+  }) as any,
   map: ((shape: SzMap<any, any>, opts: DezerializerOptions) => {
     const i = z.map(
       checkRef(shape.key, opts) ||
@@ -578,6 +605,21 @@ const dezerializers = {
   ) => {
     const i = z.discriminatedUnion(
       shape.discriminator,
+      shape.options.map(
+        (opt, idx) =>
+          checkRef(opt, opts) ||
+          d(opt, {
+            ...opts,
+            path: opts.path + "/options/" + idx,
+          }),
+      ) as any,
+      getError(shape, opts),
+    );
+    opts.pathToSchema.set(opts.path, i);
+    return getCustomChecks(i, shape, opts);
+  }) as any,
+  xor: ((shape: SzXor, opts: DezerializerOptions) => {
+    const i = z.xor(
       shape.options.map(
         (opt, idx) =>
           checkRef(opt, opts) ||

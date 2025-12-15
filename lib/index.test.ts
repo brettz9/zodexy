@@ -481,6 +481,50 @@ test.each([
     key: { type: "string" },
     value: { type: "literal", values: [42] },
   }),
+  p(
+    z.xor([
+      z.object({ type: z.literal("user"), name: z.string() }),
+      z.object({ type: z.literal("admin"), role: z.string() }),
+    ]),
+    {
+      type: "xor",
+      options: [
+        {
+          type: "object",
+          properties: {
+            type: {
+              type: "literal",
+              values: ["user"],
+            },
+            name: {
+              type: "string",
+            },
+          },
+        },
+        {
+          type: "object",
+          properties: {
+            type: {
+              type: "literal",
+              values: ["admin"],
+            },
+            role: {
+              type: "string",
+            },
+          },
+        },
+      ],
+    },
+  ),
+  p(z.looseRecord(z.string(), z.number()), {
+    type: "looseRecord",
+    key: {
+      type: "string",
+    },
+    value: {
+      type: "number",
+    },
+  }),
   p(z.map(z.number(), z.string()), {
     type: "map",
     key: { type: "number" },

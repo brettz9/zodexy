@@ -9,6 +9,7 @@ import {
   SzUnion,
   SzDiscriminatedUnion,
   SzIntersection,
+  SzXor,
   SzTuple,
   SzRecord,
   SzMap,
@@ -182,44 +183,55 @@ export type Zerialize<T extends ZodTypes> =
                                           ? Zerialize<R>
                                           : SzType
                                       >
-                                    : // Specials
-                                      T extends z.ZodPromise<
-                                          infer Value extends SomeType
-                                        >
-                                      ? SzPromise<
-                                          Value extends ZodTypes
-                                            ? Zerialize<Value>
-                                            : SzType
-                                        >
-                                      : T extends z.ZodCatch<
-                                            infer T extends SomeType
+                                    : T extends z.ZodXor<infer Options>
+                                      ? {
+                                          [Index in keyof Options]: Options[Index] extends ZodTypes
+                                            ? Zerialize<Options[Index]>
+                                            : SzType;
+                                        } extends infer SzOptions extends [
+                                          SzType,
+                                          ...SzType[],
+                                        ]
+                                        ? SzXor<SzOptions>
+                                        : SzType
+                                      : // Specials
+                                        T extends z.ZodPromise<
+                                            infer Value extends SomeType
                                           >
-                                        ? SzCatch<
-                                            T extends ZodTypes
-                                              ? Zerialize<T>
+                                        ? SzPromise<
+                                            Value extends ZodTypes
+                                              ? Zerialize<Value>
                                               : SzType
                                           >
-                                        : // Unserializable types, fallback to serializing inner type
-                                          T extends z.ZodLazy<
+                                        : T extends z.ZodCatch<
                                               infer T extends SomeType
                                             >
-                                          ? T extends ZodTypes
-                                            ? Zerialize<T>
-                                            : SzType
-                                          : T extends z.ZodPipe<
-                                                infer _In,
-                                                infer Out extends SomeType
-                                              >
-                                            ? Out extends ZodTypes
-                                              ? Zerialize<Out>
-                                              : SzType
-                                            : T extends z.ZodCatch<
-                                                  infer Inner extends SomeType
-                                                >
-                                              ? Inner extends ZodTypes
-                                                ? Zerialize<Inner>
+                                          ? SzCatch<
+                                              T extends ZodTypes
+                                                ? Zerialize<T>
                                                 : SzType
-                                              : SzType;
+                                            >
+                                          : // Unserializable types, fallback to serializing inner type
+                                            T extends z.ZodLazy<
+                                                infer T extends SomeType
+                                              >
+                                            ? T extends ZodTypes
+                                              ? Zerialize<T>
+                                              : SzType
+                                            : T extends z.ZodPipe<
+                                                  infer _In,
+                                                  infer Out extends SomeType
+                                                >
+                                              ? Out extends ZodTypes
+                                                ? Zerialize<Out>
+                                                : SzType
+                                              : T extends z.ZodCatch<
+                                                    infer Inner extends SomeType
+                                                  >
+                                                ? Inner extends ZodTypes
+                                                  ? Zerialize<Inner>
+                                                  : SzType
+                                                : SzType;
 
 type ZodTypeMap = {
   [Key in ZTypeName<ZodTypes>]: Extract<
@@ -751,7 +763,7 @@ const zerializers = {
     };
   },
   record: (def, opts) => ({
-    type: "record",
+    type: def.mode === "loose" ? "looseRecord" : "record",
     ...getCustomChecksAndErrors(def, opts),
     key: s(def.keyType, {
       ...opts,
@@ -779,7 +791,12 @@ const zerializers = {
 
   union: (def, opts) => {
     return {
-      type: "discriminator" in def ? "discriminatedUnion" : "union",
+      type:
+        "discriminator" in def
+          ? "discriminatedUnion"
+          : "inclusive" in def && !def.inclusive
+            ? "xor"
+            : "union",
       ...("discriminator" in def
         ? {
             discriminator: def.discriminator,

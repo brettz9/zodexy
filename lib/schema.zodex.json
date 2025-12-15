@@ -663,6 +663,22 @@
             }
           },
           {
+            "description": "XOR",
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "literal",
+                "values": ["xor"]
+              },
+              "options": {
+                "type": "array",
+                "element": {
+                  "$ref": "#/$defs/reference-or-type"
+                }
+              }
+            }
+          },
+          {
             "$ref": "#/$defs/tuple"
           },
           {
@@ -672,6 +688,22 @@
               "type": {
                 "type": "literal",
                 "values": ["record"]
+              },
+              "key": {
+                "$ref": "#/$defs/key"
+              },
+              "value": {
+                "$ref": "#/$defs/reference-or-type"
+              }
+            }
+          },
+          {
+            "description": "Loose Record",
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "literal",
+                "values": ["looseRecord"]
               },
               "key": {
                 "$ref": "#/$defs/key"

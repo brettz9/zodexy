@@ -47,6 +47,7 @@ export type ADTs =
   | z.ZodUnion<readonly [SomeType, ...SomeType[]]>
   | z.ZodDiscriminatedUnion<readonly SomeType[]>
   | z.ZodIntersection<SomeType, SomeType>
+  | z.ZodXor<readonly SomeType[]>
   | z.ZodEnum<any>;
 
 export type ZodTypes =
