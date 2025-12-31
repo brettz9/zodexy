@@ -774,18 +774,43 @@ const zerializers = {
       currentPath: [...opts.currentPath, "value"],
     }),
   }),
-  map: (def, opts) => ({
-    type: "map",
-    ...getCustomChecksAndErrors(def, opts),
-    key: s(def.keyType, {
-      ...opts,
-      currentPath: [...opts.currentPath, "key"],
-    }),
-    value: s(def.valueType, {
-      ...opts,
-      currentPath: [...opts.currentPath, "value"],
-    }),
-  }),
+  map: (def, opts) => {
+    const checks = def.checks?.reduce((o, check) => {
+      const chk = check._zod.def.check;
+      return {
+        ...o,
+        ...(chk === "size_equals"
+          ? {
+              min: (check as z.core.$ZodCheckSizeEquals)._zod.def.size,
+              max: (check as z.core.$ZodCheckSizeEquals)._zod.def.size,
+            }
+          : chk === "min_size"
+            ? {
+                min: (check as z.core.$ZodCheckMinSize)._zod.def.minimum,
+              }
+            : chk === "max_size"
+              ? {
+                  max: (check as z.core.$ZodCheckMaxSize)._zod.def.maximum,
+                }
+              : /* c8 ignore next -- Guard */
+                {}),
+      };
+    }, {});
+
+    return {
+      type: "map",
+      ...getCustomChecksAndErrors(def, opts),
+      ...checks,
+      key: s(def.keyType, {
+        ...opts,
+        currentPath: [...opts.currentPath, "key"],
+      }),
+      value: s(def.valueType, {
+        ...opts,
+        currentPath: [...opts.currentPath, "value"],
+      }),
+    };
+  },
 
   enum: (def) => ({ type: "enum", values: def.entries }),
 

@@ -563,7 +563,7 @@ const dezerializers = {
     return getCustomChecks(i, shape, opts);
   }) as any,
   map: ((shape: SzMap<any, any>, opts: DezerializerOptions) => {
-    const i = z.map(
+    let i = z.map(
       checkRef(shape.key, opts) ||
         d(shape.key, {
           ...opts,
@@ -576,6 +576,14 @@ const dezerializers = {
         }),
       getError(shape, opts),
     );
+
+    if ("min" in shape && shape.min !== undefined) {
+      i = i.min(shape.min);
+    }
+
+    if ("max" in shape && shape.max !== undefined) {
+      i = i.max(shape.max);
+    }
 
     opts.pathToSchema.set(opts.path, i);
     return getCustomChecks(i, shape, opts);

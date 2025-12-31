@@ -726,7 +726,9 @@
               },
               "value": {
                 "$ref": "#/$defs/reference-or-type"
-              }
+              },
+              "min": { "type": "number", "isOptional": true },
+              "max": { "type": "number", "isOptional": true }
             }
           },
           {

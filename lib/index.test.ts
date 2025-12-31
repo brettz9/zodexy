@@ -535,6 +535,26 @@ test.each([
     key: { type: "object", properties: {} },
     value: { type: "string" },
   }),
+  p(z.map(z.number(), z.string()).size(10), {
+    type: "map",
+    key: { type: "number" },
+    value: { type: "string" },
+    min: 10,
+    max: 10,
+  }),
+  p(z.map(z.number(), z.string()).min(5).max(7), {
+    type: "map",
+    key: { type: "number" },
+    value: { type: "string" },
+    min: 5,
+    max: 7,
+  }),
+  p(z.map(z.number(), z.string()).nonempty(), {
+    type: "map",
+    key: { type: "number" },
+    value: { type: "string" },
+    min: 1,
+  }),
 
   p(z.enum(["foo", "bar"]), {
     type: "enum",
