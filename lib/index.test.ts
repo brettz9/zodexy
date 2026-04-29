@@ -1957,6 +1957,9 @@ test("catch (function)", () => {
     value: undefined,
   }).toEqual(expectedShape);
 
-  const parsed = zodexSchema.safeParse(expectedShape);
+  const parsed = zodexSchema.safeParse({
+    ...expectedShape,
+    value: undefined,
+  });
   expect(parsed.success).to.equal(true);
 });
