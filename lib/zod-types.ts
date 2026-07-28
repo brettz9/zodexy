@@ -61,6 +61,7 @@ export type ZodTypes =
   | z.ZodTemplateLiteral<any>
   | z.ZodCatch<SomeType>
   | z.ZodPromise<SomeType>
+  | z.ZodPreprocess<SomeType>
   | z.ZodPipe<SomeType, SomeType>
   | z.ZodTransform<unknown, unknown>
   | z.ZodFile
