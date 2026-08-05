@@ -11,14 +11,14 @@ jobs:
   check-style:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: ./.github/actions/node
       - run: pnpm check-style
 
   lint:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: ./.github/actions/node
       - run: pnpm lint
 
@@ -28,7 +28,7 @@ jobs:
       run:
         working-directory: lib
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: ./.github/actions/node
       - run: pnpm test
 
@@ -38,7 +38,7 @@ jobs:
       run:
         working-directory: lib
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: ./.github/actions/node
       - run: pnpm build
 
@@ -50,7 +50,7 @@ jobs:
         working-directory: lib
     if: github.ref == 'refs/heads/main'
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: ./.github/actions/node
         with:
           node-version: 20.x
