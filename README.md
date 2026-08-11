@@ -1,5 +1,7 @@
 # Zodexy
 
+**This is a fork of [zodex](https://github.com/commonbaseapp/zodex) updated to work with the latest Zod.**
+
 Type-safe (de)serialization library for [zod](https://zod.dev/) (v4 format). It both serializes and simplifies types into a JSON format, in the following ways:
 
 - optional, nullable and default types are inlined into any given types itself
