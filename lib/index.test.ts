@@ -6,10 +6,10 @@ import { ZodTypes } from "./zod-types.js";
 
 import { dezerialize, SzType, zerialize, Zerialize } from "./index.js";
 
-const zodexSchemaJSON = JSON.parse(
-  fs.readFileSync("./schema.zodex.json", "utf-8"),
+const zodexySchemaJSON = JSON.parse(
+  fs.readFileSync("./schema.zodexy.json", "utf-8"),
 );
-const zodexSchema = dezerialize(zodexSchemaJSON);
+const zodexySchema = dezerialize(zodexySchemaJSON);
 
 const p = <Schema extends ZodTypes, Shape extends SzType = Zerialize<Schema>>(
   schema: Schema,
@@ -625,7 +625,7 @@ test.each([
   const dezer = dezerialize(shape) as any;
   const rezer = zerialize(dezer);
   expect(rezer).toEqual(zerialize(schema));
-  const parsed = zodexSchema.safeParse(shape);
+  const parsed = zodexySchema.safeParse(shape);
   if (!parsed.success) {
     console.log(parsed);
   }
@@ -642,7 +642,7 @@ test.each([
   }),
 ])("isOptional/isNullable/readonly", (schema, shape) => {
   expect(zerialize(dezerialize(shape) as any)).toEqual(zerialize(schema));
-  const parsed = zodexSchema.safeParse(shape);
+  const parsed = zodexySchema.safeParse(shape);
   expect(parsed.success).to.equal(true);
 });
 
@@ -673,7 +673,7 @@ test("custom errors", () => {
   const reserialized = zerialize(dezSchema, { errors });
   expect(reserialized).toEqual(expectedShape);
 
-  const parsed = zodexSchema.safeParse(expectedShape);
+  const parsed = zodexySchema.safeParse(expectedShape);
   expect(parsed.success).to.equal(true);
 });
 
@@ -744,7 +744,7 @@ test("discriminated union", () => {
     reach: 42,
   });
 
-  const parsed = zodexSchema.safeParse(shape);
+  const parsed = zodexySchema.safeParse(shape);
   expect(parsed.success).to.equal(true);
 });
 
@@ -758,7 +758,7 @@ test("discriminated union", () => {
 //   });
 //   expect(dezerialize(shape as SzType).parse("yes")).toEqual(true);
 
-//   const parsed = zodexSchema.safeParse(shape);
+//   const parsed = zodexySchema.safeParse(shape);
 //   expect(parsed.success).to.equal(true);
 // });
 
@@ -772,7 +772,7 @@ test("coerce (number)", () => {
   });
   expect(dezerialize(shape as SzType).parse("42")).toEqual(42);
 
-  const parsed = zodexSchema.safeParse(shape);
+  const parsed = zodexySchema.safeParse(shape);
   expect(parsed.success).to.equal(true);
 });
 
@@ -786,7 +786,7 @@ test("coerce (bigint)", () => {
   });
   expect(dezerialize(shape as SzType).parse("42")).toEqual(42n);
 
-  const parsed = zodexSchema.safeParse(shape);
+  const parsed = zodexySchema.safeParse(shape);
   expect(parsed.success).to.equal(true);
 });
 
@@ -801,7 +801,7 @@ test("coerce (date)", () => {
   expect(dezerialize(shape as SzType).parse("1999-01-01")).toEqual(
     new Date("1999-01-01"),
   );
-  const parsed = zodexSchema.safeParse(shape);
+  const parsed = zodexySchema.safeParse(shape);
   expect(parsed.success).to.equal(true);
 });
 
@@ -815,7 +815,7 @@ test("coerce (string)", () => {
   });
   expect(dezerialize(shape as SzType).parse(42)).toEqual("42");
 
-  const parsed = zodexSchema.safeParse(shape);
+  const parsed = zodexySchema.safeParse(shape);
   expect(parsed.success).to.equal(true);
 });
 
@@ -828,7 +828,7 @@ test("coerce (boolean)", () => {
     coerce: true,
   });
   expect(dezerialize(shape as SzType).parse(0)).toEqual(false);
-  const parsed = zodexSchema.safeParse(shape);
+  const parsed = zodexySchema.safeParse(shape);
   expect(parsed.success).to.equal(true);
 });
 
@@ -858,7 +858,7 @@ test("preprocess", () => {
   const res1 = dezSchema.safeParse(3);
   expect(res1.data).to.equal(8);
 
-  const parsed = zodexSchema.safeParse(expectedShape);
+  const parsed = zodexySchema.safeParse(expectedShape);
   expect(parsed.success).to.equal(true);
 });
 
@@ -955,7 +955,7 @@ test("transforms", () => {
   const res3 = dezSchema3.safeParse(3);
   expect(res3.data).to.equal(10);
 
-  const parsed = zodexSchema.safeParse(expectedShape);
+  const parsed = zodexySchema.safeParse(expectedShape);
   expect(parsed.success).to.equal(true);
 });
 
@@ -1059,7 +1059,7 @@ test("named checks and transforms", () => {
   // Will be transformed down
   expect(res4.data.getTime()).toBeLessThan(new Date().getTime());
 
-  const parsed = zodexSchema.safeParse(expectedShape);
+  const parsed = zodexySchema.safeParse(expectedShape);
   expect(parsed.success).to.equal(true);
 });
 
@@ -1098,7 +1098,7 @@ test("dezerialize checks without options", () => {
 
   expect(res1.success).to.equal(true);
 
-  const parsed = zodexSchema.safeParse(expectedShape);
+  const parsed = zodexySchema.safeParse(expectedShape);
   expect(parsed.success).to.equal(true);
 });
 
@@ -1165,7 +1165,7 @@ test("recursive schemas (nested)", () => {
   const reserialized = zerialize(dezSchema as any);
   expect(reserialized).toEqual(expectedShape);
 
-  const parsed = zodexSchema.safeParse(expectedShape);
+  const parsed = zodexySchema.safeParse(expectedShape);
   expect(parsed.success).to.equal(true);
 });
 
@@ -1220,7 +1220,7 @@ test("recursive schemas", () => {
   const reserialized = zerialize(dezSchema as any);
   expect(reserialized).toEqual(expectedShape);
 
-  const parsed = zodexSchema.safeParse(expectedShape);
+  const parsed = zodexySchema.safeParse(expectedShape);
   expect(parsed.success).to.equal(true);
 });
 
@@ -1269,7 +1269,7 @@ test("recursive tuple schema", () => {
   const reserialized = zerialize(dezSchema as any);
   expect(reserialized).toEqual(expectedShape);
 
-  const parsed = zodexSchema.safeParse(expectedShape);
+  const parsed = zodexySchema.safeParse(expectedShape);
   expect(parsed.success).to.equal(true);
 });
 
@@ -1298,7 +1298,7 @@ test("Object with inner $ref", () => {
   expect(zerialize(dezerialize(shape as any) as any)).toEqual(
     zerialize(schema),
   );
-  const parsed = zodexSchema.safeParse(shape);
+  const parsed = zodexySchema.safeParse(shape);
   expect(parsed.success).to.equal(true);
 });
 
@@ -1460,7 +1460,7 @@ test("Large object with inner $ref", () => {
   expect(zerialize(dezerialize(shape as any) as any)).toEqual(
     zerialize(schema),
   );
-  const parsed = zodexSchema.safeParse(shape);
+  const parsed = zodexySchema.safeParse(shape);
   expect(parsed.success).to.equal(true);
 });
 
@@ -1898,7 +1898,7 @@ test("catch", () => {
   const rezer = zerialize(dezSchema as any);
   expect(rezer).toEqual(expectedShape);
 
-  const parsed = zodexSchema.safeParse(expectedShape);
+  const parsed = zodexySchema.safeParse(expectedShape);
   expect(parsed.success).to.equal(true);
 });
 
@@ -1926,7 +1926,7 @@ test("catch (object)", () => {
   const rezer = zerialize(dezSchema as any);
   expect(rezer).toEqual(expectedShape);
 
-  const parsed = zodexSchema.safeParse(expectedShape);
+  const parsed = zodexySchema.safeParse(expectedShape);
   expect(parsed.success).to.equal(true);
 });
 
@@ -1957,7 +1957,7 @@ test("catch (function)", () => {
     value: undefined,
   }).toEqual(expectedShape);
 
-  const parsed = zodexSchema.safeParse({
+  const parsed = zodexySchema.safeParse({
     ...expectedShape,
     value: undefined,
   });

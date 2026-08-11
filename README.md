@@ -1,4 +1,4 @@
-# Zodex
+# Zodexy
 
 Type-safe (de)serialization library for [zod](https://zod.dev/) (v4 format). It both serializes and simplifies types into a JSON format, in the following ways:
 
@@ -17,18 +17,18 @@ Type-safe (de)serialization library for [zod](https://zod.dev/) (v4 format). It 
 ## Installation
 
 ```sh
-pnpm add zodex
+pnpm add zodexy
 # or
-yarn add zodex
+yarn add zodexy
 # or
-npm install zodex
+npm install zodexy
 ```
 
 ## Usage
 
 ```ts
 import { z } from "zod";
-import { zerialize } from "zodex";
+import { zerialize } from "zodexy";
 
 const someZodType = z.discriminatedUnion("id", [
   z.object({ id: z.literal("a"), count: z.number().optional() }),
@@ -104,7 +104,7 @@ will need to use a library like
 [`json-refs`](https://github.com/whitlockjc/json-refs) (with `resolveRefs`)
 to first resolve such references and then supply the object to `dezerialize`.
 
-Zodex will serialize local references, including handling recursive ones. As
+Zodexy will serialize local references, including handling recursive ones. As
 with JSON Schema, the `$defs` property may be a reasonable top-level property
 to use as storage for local references, but it receives no special treatment
 by this library (any property could be targeted by one's references).

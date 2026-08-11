@@ -9,7 +9,7 @@ import { defineConfig } from "eslint/config";
 export default defineConfig(
   {
     ignores: [
-      "lib/schema.zodex.json",
+      "lib/schema.zodexy.json",
       "**/dist/",
       ".idea",
       "coverage",

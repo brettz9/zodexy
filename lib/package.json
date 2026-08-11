@@ -1,5 +1,5 @@
 {
-  "name": "zodex",
+  "name": "zodexy",
   "version": "0.0.0-dev",
   "description": "Type-safe (de)serialization for Zod",
   "type": "module",
@@ -9,10 +9,10 @@
     "import": "./dist/esm/index.js",
     "default": "./dist/index.js"
   },
-  "bugs": "https://github.com/commonbaseapp/zodex/issues",
+  "bugs": "https://github.com/brettz9/zodexy/issues",
   "repository": {
     "type": "git",
-    "url": "https://github.com/commonbaseapp/zodex"
+    "url": "https://github.com/brettz9/zodexy"
   },
   "keywords": [
     "zod",
@@ -25,7 +25,7 @@
   "scripts": {
     "test": "vitest --coverage --silent=false",
     "tsc": "tsc",
-    "build": "rm -rf dist && tsc -p tsconfig-prod.json && cp schema.zodex.json dist/schema.zodex.json && tsup index.ts --format esm --legacy-output",
+    "build": "rm -rf dist && tsc -p tsconfig-prod.json && cp schema.zodexy.json dist/schema.zodexy.json && tsup index.ts --format esm --legacy-output",
     "prepublish": "pnpm run build"
   },
   "peerDependencies": {

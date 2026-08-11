@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import z from "zod";
-import { dezerialize, SzType, zerialize } from "zodex";
+import { dezerialize, SzType, zerialize } from "zodexy";
 
 const DEFAULT_ZOD_VALUE = `z.object({
   n: z.number().min(42),
@@ -15,7 +15,7 @@ export function App() {
   const [zodValue, setZodValue] = useState(DEFAULT_ZOD_VALUE);
   const [objValue, setObjValue] = useState(DEFAULT_OBJ_VALUE);
 
-  const zodexValue = useMemo<SzType | null>(() => {
+  const zodexyValue = useMemo<SzType | null>(() => {
     try {
       return zerialize(new Function("z", `return ${zodValue}`)(z));
     } catch (error) {
@@ -24,8 +24,8 @@ export function App() {
   }, [zodValue]);
 
   const dezodSchema = useMemo(
-    () => zodexValue && dezerialize(zodexValue),
-    [zodexValue],
+    () => zodexyValue && dezerialize(zodexyValue),
+    [zodexyValue],
   );
   const result = useMemo(() => {
     try {
@@ -40,15 +40,15 @@ export function App() {
   return (
     <div className="app">
       <p>
-        <a href="https://github.com/commonbaseapp/zodex" target="_blank">
-          zodex
+        <a href="https://github.com/brettz9/zodexy" target="_blank">
+          zodexy
         </a>{" "}
         is a type-safe (de)serialization library for zod. It both serializes and
         simplifies types into JSON, as you can see in the example below.
         <br />
         <br />
         You can edit the zod schema below to see how the corresponding
-        serialized zodex schema looks like.
+        serialized zodexy schema looks like.
       </p>
       <div className="playground">
         <label>zod schema</label>
@@ -58,9 +58,9 @@ export function App() {
           value={zodValue}
           onChange={(event) => setZodValue(event.target.value)}
         />
-        {zodexValue && (
+        {zodexyValue && (
           <pre>
-            <code>{JSON.stringify(zodexValue, null, 2)}</code>
+            <code>{JSON.stringify(zodexyValue, null, 2)}</code>
           </pre>
         )}
 

@@ -59,7 +59,7 @@ importers:
       zod:
         specifier: ^4.3.6
         version: 4.3.6
-      zodex:
+      zodexy:
         specifier: workspace:*
         version: link:../lib
     devDependencies:
