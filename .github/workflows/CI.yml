@@ -61,7 +61,8 @@ jobs:
         id: semrel
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          update-file: package.json
+          # path is relative to repo root: defaults.run.working-directory only applies to `run:` steps, not `uses:` inputs
+          update-file: lib/package.json
           allow-initial-development-versions: true
       - run: pnpm publish --no-git-checks
         if: steps.semrel.outputs.version != ''
