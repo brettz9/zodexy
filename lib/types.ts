@@ -80,7 +80,7 @@ export type SzString = {
   (
     | object
     | { kind: "ip"; version?: "v4" | "v6" }
-    | { kind: "cidr"; version?: "v4" | "v6" }
+    | { kind: "cidr"; version: "v4" | "v6" }
     | { kind: "uuid"; version?: "v4" | "v7" }
     | { regex: string; flags?: string }
     | {
@@ -168,7 +168,6 @@ export type SzObject<
 > = {
   type: "object";
   properties: T;
-  unknownKeys?: "strict" | "strip" | "passthrough";
   catchall?: U;
 };
 
