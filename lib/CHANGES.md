@@ -1,4 +1,8 @@
-# Version ? (Zod v4)
+# CHANGES for zodexy
+
+## 0.21.1
+
+- fix: point go-semantic-release update-file at lib/package.json
 
 Breaking changes:
 
@@ -7,7 +11,6 @@ Breaking changes:
 - fix: drop `finite` (numbers no longer allow infinite values in Zod) and `int` (uses `format` instead)
 - fix: drop `effects`, `preprocesses`, and `superRefinements` in favor of `checks` property and `transform` and `pipe` types; `transforms` expects new Zod 4 function format
 - fix: remove object's `unknownKeys`
-- fix: remove function type
 - fix: remove nativeEnum type
 - fix: represent `enum` type as object instead of array, with number as well as string keys and values
 - fix: disallow other properties with JSON references (per spec)
@@ -15,6 +18,11 @@ Breaking changes:
 
 Other changes:
 
+- feat: support zod 4.3 min/max on maps
+- feat: support xor and looseRecord for zod 4.2.1
+- feat: support metadata
+- fix: use preferred (equivalent) method for descriptive metadata
+- fix: make properties of file optional
 - feat: for number and bigInt types, add `format`
 - feat: adds serialization for template literals (with `parts`)
 - feat: add serialization for `File` (with `min`, `max`, and `mime`)
@@ -25,3 +33,5 @@ Other changes:
 - feat: add to literals: bigInt, boolean, null, and undefined types
 - feat: bump `type-fest` and `zod` dependencies
 - fix: allow any type as Map key
+- docs: mention other Zodex-related projects
+- chore: update deps
