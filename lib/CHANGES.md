@@ -1,5 +1,9 @@
 # CHANGES for zodexy
 
+## 0.21.2
+
+- fix(types): ensure `cidr` version is required and `unknownKeys` is dropped from object
+
 ## 0.21.1
 
 - fix: point go-semantic-release update-file at lib/package.json
