@@ -1963,3 +1963,33 @@ test("catch (function)", () => {
   });
   expect(parsed.success).to.equal(true);
 });
+
+test("applies named checks to any schemas", () => {
+  let calls = 0;
+
+  const schema = dezerialize(
+    {
+      type: "any",
+      checks: [{ name: "symbol" }],
+    },
+    {
+      checks: {
+        symbol(payload) {
+          calls++;
+
+          if (typeof payload.value !== "symbol") {
+            payload.issues.push({
+              code: "custom",
+              input: payload.value,
+              message: "Expected a symbol",
+            });
+          }
+        },
+      },
+    },
+  );
+
+  expect(schema.safeParse(Symbol("abc")).success).toBe(true);
+  expect(schema.safeParse("abc").success).toBe(false);
+  expect(calls).toBe(2);
+});
