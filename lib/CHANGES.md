@@ -1,5 +1,9 @@
 # CHANGES for zodexy
 
+## 0.24.0
+
+- feat: implement `instanceof` type
+
 ## 0.23.0
 
 - feat: implement `codec` type

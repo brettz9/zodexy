@@ -273,6 +273,13 @@ export type SzCodec<T extends SzType = SzType, U extends SzType = SzType> = {
   output: U;
 };
 
+export type SzInstanceOf = {
+  type: "instanceof";
+  name: string;
+};
+
+export type InstanceConstructor = new (...args: any[]) => any;
+
 export type SzTransform = {
   type: "transform";
   name: string;
@@ -343,6 +350,7 @@ export type SzType = (
   | SzCatch<any>
   | SzPipe<any, any>
   | SzCodec<any, any>
+  | SzInstanceOf
   | SzTransform
 ) &
   SzExtras;

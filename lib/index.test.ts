@@ -864,6 +864,35 @@ test("codecs", () => {
   );
 });
 
+test("instanceof", () => {
+  class Example {}
+  const instances = { Example };
+  const schema = z.instanceof(Example);
+  const expectedShape = {
+    type: "instanceof",
+    name: "Example",
+  } as const;
+
+  const serialized = zerialize(schema, { instances });
+  expect(serialized).toEqual(expectedShape);
+
+  const restored = dezerialize(serialized, { instances });
+  expect(restored.safeParse(new Example()).success).toBe(true);
+  expect(restored.safeParse({}).success).toBe(false);
+  expect(zerialize(restored, { instances })).toEqual(expectedShape);
+  expect(zodexySchema.safeParse(expectedShape).success).toBe(true);
+
+  expect(() => zerialize(schema)).toThrow(
+    "Instance constructor must be registered before it can be serialized",
+  );
+  expect(() => dezerialize(expectedShape)).toThrow(
+    "Must supply an instance constructor for the given name, Example",
+  );
+  expect(() => zerialize(z.custom(() => true))).toThrow(
+    "Only instanceof custom schemas can be serialized",
+  );
+});
+
 test("preprocess", () => {
   const transforms = {
     addFive: (val: any) => val + 5,

@@ -19,6 +19,7 @@ import {
   // SzNumber,
   SzPipe,
   SzCodec,
+  SzInstanceOf,
   SzCatch,
   SzReadonly,
   SzPrimitive,
@@ -32,6 +33,7 @@ import {
   SzSymbol,
   SzExtras,
   SzKey,
+  InstanceConstructor,
 } from "./types.js";
 import { ZodTypes, ZTypeName } from "./zod-types.js";
 
@@ -208,44 +210,46 @@ export type Zerialize<T extends ZodTypes> =
                                           ? SzXor<SzOptions>
                                           : SzType
                                         : // Specials
-                                          T extends z.ZodPromise<
-                                              infer Value extends SomeType
-                                            >
-                                          ? SzPromise<
-                                              Value extends ZodTypes
-                                                ? Zerialize<Value>
-                                                : SzType
-                                            >
-                                          : T extends z.ZodCatch<
-                                                infer T extends SomeType
+                                          T extends z.ZodCustom<any, any>
+                                          ? SzInstanceOf
+                                          : T extends z.ZodPromise<
+                                                infer Value extends SomeType
                                               >
-                                            ? SzCatch<
-                                                T extends ZodTypes
-                                                  ? Zerialize<T>
+                                            ? SzPromise<
+                                                Value extends ZodTypes
+                                                  ? Zerialize<Value>
                                                   : SzType
                                               >
-                                            : // Unserializable types, fallback to serializing inner type
-                                              T extends z.ZodLazy<
+                                            : T extends z.ZodCatch<
                                                   infer T extends SomeType
                                                 >
-                                              ? T extends ZodTypes
-                                                ? Zerialize<T>
-                                                : SzType
-                                              : T extends z.ZodPipe<
-                                                    infer _In,
-                                                    infer Out extends SomeType
-                                                  >
-                                                ? Out extends ZodTypes
-                                                  ? Zerialize<Out>
-                                                  : SzType
-                                                : T extends z.ZodCatch<
-                                                      infer Inner extends
-                                                        SomeType
-                                                    >
-                                                  ? Inner extends ZodTypes
-                                                    ? Zerialize<Inner>
+                                              ? SzCatch<
+                                                  T extends ZodTypes
+                                                    ? Zerialize<T>
                                                     : SzType
-                                                  : SzType;
+                                                >
+                                              : // Unserializable types, fallback to serializing inner type
+                                                T extends z.ZodLazy<
+                                                    infer T extends SomeType
+                                                  >
+                                                ? T extends ZodTypes
+                                                  ? Zerialize<T>
+                                                  : SzType
+                                                : T extends z.ZodPipe<
+                                                      infer _In,
+                                                      infer Out extends SomeType
+                                                    >
+                                                  ? Out extends ZodTypes
+                                                    ? Zerialize<Out>
+                                                    : SzType
+                                                  : T extends z.ZodCatch<
+                                                        infer Inner extends
+                                                          SomeType
+                                                      >
+                                                    ? Inner extends ZodTypes
+                                                      ? Zerialize<Inner>
+                                                      : SzType
+                                                    : SzType;
 
 type ZodTypeMap = {
   [Key in ZTypeName<ZodTypes>]: Extract<
@@ -265,6 +269,7 @@ type ZerializerOptions = {
     [key: string]: (ctx: z.core.ParsePayload) => Promise<unknown> | unknown;
   };
   codecs?: Record<string, CodecFunctions>;
+  instances?: Record<string, InstanceConstructor>;
   currentPath: string[];
   seenObjects: WeakMap<ZodTypes, string>;
 };
@@ -278,6 +283,7 @@ type ZerializersMap = {
   [Key in ZTypeName<ZodTypes>]: (
     def: ZodTypeMap[Key]["def"],
     opts: ZerializerOptions,
+    schema: ZodTypeMap[Key],
   ) => any; //Zerialize<ZodTypeMap[Key]>;
 };
 
@@ -972,6 +978,25 @@ const zerializers = {
     ...s(def.innerType, opts, true),
     readonly: true,
   }),
+  custom: (_def, opts, schema) => {
+    const Constructor = schema._zod.bag.Class as
+      | InstanceConstructor
+      | undefined;
+    if (!Constructor) {
+      throw new Error("Only instanceof custom schemas can be serialized");
+    }
+
+    const name = Object.entries(opts.instances ?? {}).find(
+      ([, instance]) => instance === Constructor,
+    )?.[0];
+    if (!name) {
+      throw new Error(
+        "Instance constructor must be registered before it can be serialized",
+      );
+    }
+
+    return { type: "instanceof", name } satisfies SzInstanceOf;
+  },
 } satisfies ZerializersMap as ZerializersMap;
 
 // Must match the exported Zerialize types
@@ -1005,7 +1030,11 @@ export function zerializeRefs<T extends ZodTypes>(
 
   opts.seenObjects.set(schema, objectPath);
 
-  const zer = zerializers[def.type](def as any, opts as ZerializerOptions);
+  const zer = zerializers[def.type](
+    def as any,
+    opts as ZerializerOptions,
+    schema as any,
+  );
 
   if (typeof schema.description === "string") {
     zer.description = schema.description;

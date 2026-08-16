@@ -859,6 +859,19 @@
             }
           },
           {
+            "description": "Instance of a registered constructor",
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "literal",
+                "values": ["instanceof"]
+              },
+              "name": {
+                "type": "string"
+              }
+            }
+          },
+          {
             "description": "Catch",
             "type": "object",
             "properties": {

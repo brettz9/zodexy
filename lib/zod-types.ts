@@ -66,6 +66,7 @@ export type ZodTypes =
   | z.ZodCodec<any, any>
   | z.ZodTransform<unknown, unknown>
   | z.ZodFile
+  | z.ZodCustom<any, any>
   | z.ZodFunction;
 
 export type ZTypeName<T extends ZodTypes> = T["_zod"]["def"]["type"];

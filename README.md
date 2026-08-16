@@ -84,7 +84,7 @@ options:
 ## Options
 
 Both `zerialize` and `dezerialize` accept an options object with the
-same `errors`, `checks`, `transforms`, and `codecs` properties.
+same `errors`, `checks`, `transforms`, `codecs`, and `instances` properties.
 
 Since Zod does not allow the specification of the names of errors, checks and
 transforms (and preprocesses), we allow you to supply
@@ -99,6 +99,8 @@ Properties:
 - `transforms` - Map of name to `.transform()` (and `.preprocess`) functions
 - `codecs` - Map of name to the `{ decode, encode }` functions passed to
   `z.codec()`
+- `instances` - Map of name to constructors used to serialize and restore
+  `z.instanceof()` schemas
 
 Codec implementations remain consumer-owned and are matched by function
 identity during serialization:
@@ -117,6 +119,22 @@ const restored = dezerialize(shape, { codecs });
 
 The serialized codec contains its registry name and its fully serialized
 `input` and `output` schemas. No Zod metadata key is reserved.
+
+Zod exposes the constructor supplied to `z.instanceof()` as
+`schema._zod.bag.Class`. Zodexy matches it by identity against `instances`:
+
+```ts
+class Example {}
+
+const instances = { Example };
+const schema = z.instanceof(Example);
+const shape = zerialize(schema, { instances });
+const restored = dezerialize(shape, { instances });
+```
+
+This serializes as `{ "type": "instanceof", "name": "Example" }`. Ordinary
+`z.custom()` predicates remain unsupported because they provide no equivalent
+introspectable runtime definition.
 
 ## Use of JSON References
 
@@ -158,7 +176,7 @@ or target the whole object or individual properties.
 - `catch` with a function can have its then-value serialized but it
   cannot then be deserialized back into using the original function
 - Due to technical limitations, we cannot support the regular
-  `refine()`, `custom()` and `instanceof` methods (and they will be
+  `refine()` and `custom()` methods (and they will be
   ignored), but these are really just implementations of `check()`
   which is supported
 
