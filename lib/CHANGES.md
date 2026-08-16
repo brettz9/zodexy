@@ -1,5 +1,9 @@
 # CHANGES for zodexy
 
+## 0.23.0
+
+- feat: implement `codec` type
+
 ## 0.22.0
 
 - feat: allow checks on `unknown` and `any`

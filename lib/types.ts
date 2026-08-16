@@ -266,6 +266,13 @@ export type SzPipe<T extends SzType = SzType, U extends SzType = SzType> = {
   outer: U;
 };
 
+export type SzCodec<T extends SzType = SzType, U extends SzType = SzType> = {
+  type: "codec";
+  name: string;
+  input: T;
+  output: U;
+};
+
 export type SzTransform = {
   type: "transform";
   name: string;
@@ -335,6 +342,7 @@ export type SzType = (
   | SzFunction<any, any>
   | SzCatch<any>
   | SzPipe<any, any>
+  | SzCodec<any, any>
   | SzTransform
 ) &
   SzExtras;
@@ -365,4 +373,6 @@ export type SzUnionize<T extends SzType | SzRef> =
                           ? SzUnionize<T>
                           : T extends SzPromise<infer Value>
                             ? SzUnionize<Value>
-                            : never);
+                            : T extends SzCodec<infer Input, infer Output>
+                              ? SzUnionize<Input | Output>
+                              : never);

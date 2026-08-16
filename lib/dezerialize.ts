@@ -19,6 +19,7 @@ import {
   SzEnum,
   SzPromise,
   SzPipe,
+  SzCodec,
   SzTransform,
   SzCatch,
   SzType,
@@ -40,6 +41,7 @@ import {
 } from "./types.js";
 
 import { ZodTypes } from "./zod-types.js";
+import type { CodecFunctions } from "./zerialize.js";
 
 export type DezerializerOptions = {
   errors?: {
@@ -51,6 +53,7 @@ export type DezerializerOptions = {
   transforms?: {
     [key: string]: (ctx: z.core.ParsePayload) => Promise<unknown> | unknown;
   };
+  codecs?: Record<string, CodecFunctions>;
   path: string;
   pathToSchema: Map<string, ZodTypes>;
   $refs: [z.ZodLazy<any>, string][];
@@ -121,35 +124,37 @@ export type Dezerialize<T extends SzType | SzRef> = T extends SzRef
                                             z.core.util.Literal
                                         >
                                       ? z.ZodLiteral<Value> // List Collections
-                                      : T extends SzPipe
-                                        ? z.ZodPipe
-                                        : T extends SzTransform
-                                          ? z.ZodTransform
-                                          : T extends SzTuple<infer _Items>
-                                            ? z.ZodTuple<any> //DezerializeArray<Items>>
-                                            : T extends SzSet<infer Value>
-                                              ? z.ZodSet<Dezerialize<Value>>
-                                              : T extends SzArray<infer Element>
-                                                ? z.ZodArray<
-                                                    Dezerialize<Element>
-                                                  > // Key/Value Collections
-                                                : T extends SzObject<
-                                                      infer Properties
+                                      : T extends SzCodec<
+                                            infer Input,
+                                            infer Output
+                                          >
+                                        ? z.ZodCodec<
+                                            Dezerialize<Input>,
+                                            Dezerialize<Output>
+                                          >
+                                        : T extends SzPipe
+                                          ? z.ZodPipe
+                                          : T extends SzTransform
+                                            ? z.ZodTransform
+                                            : T extends SzTuple<infer _Items>
+                                              ? z.ZodTuple<any> //DezerializeArray<Items>>
+                                              : T extends SzSet<infer Value>
+                                                ? z.ZodSet<Dezerialize<Value>>
+                                                : T extends SzArray<
+                                                      infer Element
                                                     >
-                                                  ? z.ZodObject<{
-                                                      [Property in keyof Properties]: Dezerialize<
-                                                        Properties[Property]
-                                                      >;
-                                                    }>
-                                                  : T extends SzRecord<
-                                                        infer Key,
-                                                        infer Value
+                                                  ? z.ZodArray<
+                                                      Dezerialize<Element>
+                                                    > // Key/Value Collections
+                                                  : T extends SzObject<
+                                                        infer Properties
                                                       >
-                                                    ? z.ZodRecord<
-                                                        Dezerialize<Key>,
-                                                        Dezerialize<Value>
-                                                      >
-                                                    : T extends SzLooseRecord<
+                                                    ? z.ZodObject<{
+                                                        [Property in keyof Properties]: Dezerialize<
+                                                          Properties[Property]
+                                                        >;
+                                                      }>
+                                                    : T extends SzRecord<
                                                           infer Key,
                                                           infer Value
                                                         >
@@ -157,48 +162,56 @@ export type Dezerialize<T extends SzType | SzRef> = T extends SzRef
                                                           Dezerialize<Key>,
                                                           Dezerialize<Value>
                                                         >
-                                                      : T extends SzMap<
+                                                      : T extends SzLooseRecord<
                                                             infer Key,
                                                             infer Value
                                                           >
-                                                        ? z.ZodMap<
+                                                        ? z.ZodRecord<
                                                             Dezerialize<Key>,
                                                             Dezerialize<Value>
-                                                          > // Enum
-                                                        : T extends SzEnum<
-                                                              infer Values
+                                                          >
+                                                        : T extends SzMap<
+                                                              infer Key,
+                                                              infer Value
                                                             >
-                                                          ? z.ZodEnum<Values> // Union/Intersection
-                                                          : T extends SzUnion<
-                                                                infer _Options
+                                                          ? z.ZodMap<
+                                                              Dezerialize<Key>,
+                                                              Dezerialize<Value>
+                                                            > // Enum
+                                                          : T extends SzEnum<
+                                                                infer Values
                                                               >
-                                                            ? z.ZodUnion<any>
-                                                            : T extends SzDiscriminatedUnion<
-                                                                  infer Discriminator,
+                                                            ? z.ZodEnum<Values> // Union/Intersection
+                                                            : T extends SzUnion<
                                                                   infer _Options
                                                                 >
-                                                              ? z.ZodDiscriminatedUnion<any>
-                                                              : T extends SzIntersection<
-                                                                    infer L,
-                                                                    infer R
+                                                              ? z.ZodUnion<any>
+                                                              : T extends SzDiscriminatedUnion<
+                                                                    infer Discriminator,
+                                                                    infer _Options
                                                                   >
-                                                                ? z.ZodIntersection<
-                                                                    Dezerialize<L>,
-                                                                    Dezerialize<R>
-                                                                  > // Specials
-                                                                : T extends SzPromise<
-                                                                      infer Value
+                                                                ? z.ZodDiscriminatedUnion<any>
+                                                                : T extends SzIntersection<
+                                                                      infer L,
+                                                                      infer R
                                                                     >
-                                                                  ? z.ZodPromise<
-                                                                      Dezerialize<Value>
-                                                                    >
-                                                                  : T extends SzCatch<
+                                                                  ? z.ZodIntersection<
+                                                                      Dezerialize<L>,
+                                                                      Dezerialize<R>
+                                                                    > // Specials
+                                                                  : T extends SzPromise<
                                                                         infer Value
                                                                       >
-                                                                    ? z.ZodCatch<
+                                                                    ? z.ZodPromise<
                                                                         Dezerialize<Value>
                                                                       >
-                                                                    : any; // unknown;
+                                                                    : T extends SzCatch<
+                                                                          infer Value
+                                                                        >
+                                                                      ? z.ZodCatch<
+                                                                          Dezerialize<Value>
+                                                                        >
+                                                                      : any; // unknown;
 
 type DezerializersMap = {
   [T in SzType["type"]]: (
@@ -689,6 +702,26 @@ const dezerializers = {
       );
     }
     return z.transform(opts.transforms[shape.name]);
+  },
+  codec: (shape: SzCodec, opts: DezerializerOptions) => {
+    const codec = opts.codecs?.[shape.name];
+    if (!codec) {
+      throw new Error(
+        "Must supply a codec for the given codec name, " + shape.name,
+      );
+    }
+
+    return z.codec(
+      d(shape.input, {
+        ...opts,
+        path: opts.path + "/input",
+      }),
+      d(shape.output, {
+        ...opts,
+        path: opts.path + "/output",
+      }),
+      codec,
+    );
   },
   pipe: (shape: SzPipe, opts: DezerializerOptions) => {
     const base = (checkRef(shape.inner, opts) ||

@@ -832,6 +832,38 @@ test("coerce (boolean)", () => {
   expect(parsed.success).to.equal(true);
 });
 
+test("codecs", () => {
+  const isoDate = {
+    decode: (value: string) => new Date(value),
+    encode: (value: Date) => value.toISOString(),
+  };
+  const codecs = { isoDate };
+  const schema = z.codec(z.iso.datetime(), z.date(), isoDate);
+  const expectedShape = {
+    type: "codec",
+    name: "isoDate",
+    input: { type: "string", kind: "datetime" },
+    output: { type: "date" },
+  } as const;
+
+  const serialized = zerialize(schema, { codecs });
+  expect(serialized).toEqual(expectedShape);
+
+  const restored = dezerialize(serialized, { codecs });
+  const value = "2024-01-15T10:30:00.000Z";
+  expect(z.decode(restored, value)).toEqual(new Date(value));
+  expect(z.encode(restored, new Date(value))).toBe(value);
+  expect(zerialize(restored, { codecs })).toEqual(expectedShape);
+  expect(zodexySchema.safeParse(expectedShape).success).toBe(true);
+
+  expect(() => zerialize(schema)).toThrow(
+    "Codec must be registered before it can be serialized",
+  );
+  expect(() => dezerialize(expectedShape)).toThrow(
+    "Must supply a codec for the given codec name, isoDate",
+  );
+});
+
 test("preprocess", () => {
   const transforms = {
     addFive: (val: any) => val + 5,

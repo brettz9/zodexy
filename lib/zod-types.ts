@@ -63,6 +63,7 @@ export type ZodTypes =
   | z.ZodPromise<SomeType>
   | z.ZodPreprocess<SomeType>
   | z.ZodPipe<SomeType, SomeType>
+  | z.ZodCodec<any, any>
   | z.ZodTransform<unknown, unknown>
   | z.ZodFile
   | z.ZodFunction;

@@ -84,7 +84,7 @@ options:
 ## Options
 
 Both `zerialize` and `dezerialize` accept an options object with the
-same `errors`, `checks`, and `transforms` properties.
+same `errors`, `checks`, `transforms`, and `codecs` properties.
 
 Since Zod does not allow the specification of the names of errors, checks and
 transforms (and preprocesses), we allow you to supply
@@ -97,6 +97,26 @@ Properties:
 - `errors` - Map of name to `.someType({error: fn})` functions
 - `checks` - Map of name to `.checks()` functions
 - `transforms` - Map of name to `.transform()` (and `.preprocess`) functions
+- `codecs` - Map of name to the `{ decode, encode }` functions passed to
+  `z.codec()`
+
+Codec implementations remain consumer-owned and are matched by function
+identity during serialization:
+
+```ts
+const isoDate = {
+  decode: (value: string) => new Date(value),
+  encode: (value: Date) => value.toISOString(),
+};
+const codecs = { isoDate };
+const schema = z.codec(z.iso.datetime(), z.date(), isoDate);
+
+const shape = zerialize(schema, { codecs });
+const restored = dezerialize(shape, { codecs });
+```
+
+The serialized codec contains its registry name and its fully serialized
+`input` and `output` schemas. No Zod metadata key is reserved.
 
 ## Use of JSON References
 
@@ -113,7 +133,7 @@ by this library (any property could be targeted by one's references).
 
 Note that if you wish to use additional properties with an item containing a
 reference, e.g., `isOptional`, you will first need to wrap the JSON reference
-within a single-item union such as in the following:
+within a single-item union such as in the following (JSON reference objects may not have other properties):
 
 ```json
 {
