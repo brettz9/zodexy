@@ -81,7 +81,10 @@ export type SzString = {
     | object
     | { kind: "ip"; version?: "v4" | "v6" }
     | { kind: "cidr"; version: "v4" | "v6" }
-    | { kind: "uuid"; version?: "v4" | "v7" }
+    | {
+        kind: "uuid";
+        version?: "v1" | "v2" | "v3" | "v4" | "v5" | "v6" | "v7" | "v8";
+      }
     | { regex: string; flags?: string }
     | {
         kind: "time";

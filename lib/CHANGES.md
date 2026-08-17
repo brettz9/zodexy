@@ -1,5 +1,9 @@
 # CHANGES for zodexy
 
+## 0.24.1
+
+- fix(types): ensure allow all versions of uuid ("v1", "v2", "v3", "v4", "v5", "v6", "v7", "v8")
+
 ## 0.24.0
 
 - feat: implement `instanceof` type
