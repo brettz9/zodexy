@@ -1036,6 +1036,8 @@ export function zerializeRefs<T extends ZodTypes>(
     schema as any,
   );
 
+  Object.assign(zer, getCustomChecksAndErrors(def, opts));
+
   if (typeof schema.description === "string") {
     zer.description = schema.description;
   }

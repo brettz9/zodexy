@@ -1,5 +1,9 @@
 # CHANGES for zodexy
 
+## 0.25.0
+
+- feat: ensure custom checks and errors are applied where supported
+
 ## 0.24.1
 
 - fix(types): ensure allow all versions of uuid ("v1", "v2", "v3", "v4", "v5", "v6", "v7", "v8")

@@ -677,6 +677,122 @@ test("custom errors", () => {
   expect(parsed.success).to.equal(true);
 });
 
+test("custom checks and errors on all supported types", () => {
+  const errors = {
+    customError: () => "Bad value",
+  };
+  const checks = {
+    customCheck: (_ctx: z.core.ParsePayload<unknown>) => {},
+  };
+  const options = { checks, errors };
+  const customCheck = checks.customCheck;
+  const customError = errors.customError;
+
+  const cases: [ZodTypes, SzType][] = [
+    [z.boolean({ error: customError }).check(customCheck), { type: "boolean" }],
+    [z.nan({ error: customError }).check(customCheck), { type: "nan" }],
+    [
+      z.undefined({ error: customError }).check(customCheck),
+      { type: "undefined" },
+    ],
+    [z.null({ error: customError }).check(customCheck), { type: "null" }],
+    [z.never({ error: customError }).check(customCheck), { type: "never" }],
+    [z.void({ error: customError }).check(customCheck), { type: "void" }],
+    [z.symbol({ error: customError }).check(customCheck), { type: "symbol" }],
+    [
+      z.literal("value", { error: customError }).check(customCheck),
+      { type: "literal", values: ["value"] },
+    ],
+    [
+      z.templateLiteral(["value"], { error: customError }).check(customCheck),
+      { type: "templateLiteral", parts: ["value"] },
+    ],
+    [
+      z.enum(["value"], { error: customError }).check(customCheck),
+      { type: "enum", values: { value: "value" } },
+    ],
+  ];
+
+  for (const [schema, baseShape] of cases) {
+    const expectedShape = {
+      ...baseShape,
+      checks: [{ name: "customCheck" }],
+      error: { key: "customError" },
+    } as SzType;
+    const shape = zerialize(schema, options);
+    expect(shape).toEqual(expectedShape);
+    expect(zerialize(dezerialize(shape, options), options)).toEqual(
+      expectedShape,
+    );
+  }
+});
+
+test("custom checks on supported special types", () => {
+  const checks = {
+    customCheck: (_ctx: z.core.ParsePayload<unknown>) => {},
+  };
+  const transforms = {
+    identity: (ctx: z.core.ParsePayload) => ctx.value,
+  };
+  const codecs = {
+    identity: {
+      decode: (value: string) => value,
+      encode: (value: string) => value,
+    },
+  };
+  const instances = { Date };
+  const errors = { customError: () => "Bad value" };
+  const options = { checks, transforms, codecs, instances, errors };
+  const customCheck = checks.customCheck;
+
+  const cases: [ZodTypes, SzType][] = [
+    [
+      z.promise(z.string()).check(customCheck),
+      { type: "promise", value: { type: "string" } },
+    ],
+    [
+      z.string().catch("").check(customCheck),
+      { type: "catch", value: "", innerType: { type: "string" } },
+    ],
+    [
+      z.transform(transforms.identity).check(customCheck),
+      { type: "transform", name: "identity" },
+    ],
+    [
+      z.codec(z.string(), z.string(), codecs.identity).check(customCheck),
+      {
+        type: "codec",
+        name: "identity",
+        input: { type: "string" },
+        output: { type: "string" },
+      },
+    ],
+  ];
+
+  for (const [schema, baseShape] of cases) {
+    const expectedShape = {
+      ...baseShape,
+      checks: [{ name: "customCheck" }],
+    } as SzType;
+    const shape = zerialize(schema, options);
+    expect(shape).toEqual(expectedShape);
+    expect(zerialize(dezerialize(shape, options), options)).toEqual(
+      expectedShape,
+    );
+  }
+
+  const instanceShape = {
+    type: "instanceof",
+    name: "Date",
+    error: { key: "customError" },
+  } as const;
+  const instanceSchema = z.instanceof(Date, { error: errors.customError });
+  expect(zerialize(instanceSchema, options)).toEqual(instanceShape);
+  expect(zerialize(dezerialize(instanceShape, options), options)).toEqual(
+    instanceShape,
+  );
+});
+
 test("discriminated union", () => {
   const schema = z
     .discriminatedUnion("name", [

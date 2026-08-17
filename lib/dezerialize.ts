@@ -367,10 +367,15 @@ const dezerializers = {
     return getCustomChecks(s, shape, opts);
   },
   boolean: (shape, opts) =>
-    shape.coerce
-      ? z.coerce.boolean(getError(shape, opts))
-      : z.boolean(getError(shape, opts)),
-  nan: (shape, opts) => z.nan(getError(shape, opts)),
+    getCustomChecks(
+      shape.coerce
+        ? z.coerce.boolean(getError(shape, opts))
+        : z.boolean(getError(shape, opts)),
+      shape,
+      opts,
+    ),
+  nan: (shape, opts) =>
+    getCustomChecks(z.nan(getError(shape, opts)), shape, opts),
   bigInt: (shape, opts) => {
     const method =
       shape.format && ["uint64", "int64"].includes(shape.format)
@@ -406,7 +411,7 @@ const dezerializers = {
       i = i.mime(shape.mime);
     }
 
-    return i;
+    return getCustomChecks(i, shape, opts);
   },
   date: (shape, opts) => {
     let i = shape.coerce
@@ -420,42 +425,56 @@ const dezerializers = {
     }
     return getCustomChecks(i, shape, opts);
   },
-  undefined: (shape, opts) => z.undefined(getError(shape, opts)),
-  null: (shape, opts) => z.null(getError(shape, opts)),
+  undefined: (shape, opts) =>
+    getCustomChecks(z.undefined(getError(shape, opts)), shape, opts),
+  null: (shape, opts) =>
+    getCustomChecks(z.null(getError(shape, opts)), shape, opts),
   any: (shape, opts) => getCustomChecks(z.any(), shape, opts),
   unknown: (shape, opts) => getCustomChecks(z.unknown(), shape, opts),
-  never: (shape, opts) => z.never(getError(shape, opts)),
-  void: (shape, opts) => z.void(getError(shape, opts)),
+  never: (shape, opts) =>
+    getCustomChecks(z.never(getError(shape, opts)), shape, opts),
+  void: (shape, opts) =>
+    getCustomChecks(z.void(getError(shape, opts)), shape, opts),
 
-  literal: (shape, opts) => z.literal(shape.values, getError(shape, opts)),
+  literal: (shape, opts) =>
+    getCustomChecks(
+      z.literal(shape.values, getError(shape, opts)),
+      shape,
+      opts,
+    ),
   templateLiteral: (shape, opts) => {
     const error = getError(shape, opts);
-    return z.templateLiteral(
-      shape.parts.map((part, idx) => {
-        if (typeof part === "string") {
-          return part;
-        }
-        const schema =
-          checkRef(part, opts) ||
-          d(part, {
-            ...opts,
-            path: opts.path + "/parts/" + idx,
-          });
-        // In Zod 4, template literal parts must have a defined pattern property.
-        // We cast to the expected type since we know the runtime behavior is correct.
-        return schema as z.core.$ZodTemplateLiteralPart;
-      }),
-      /* c8 ignore next 2 -- TS */
-      typeof error === "string"
-        ? error
-        : {
-            ...error,
-            ...(shape.format ? { format: shape.format } : {}),
-          },
+    return getCustomChecks(
+      z.templateLiteral(
+        shape.parts.map((part, idx) => {
+          if (typeof part === "string") {
+            return part;
+          }
+          const schema =
+            checkRef(part, opts) ||
+            d(part, {
+              ...opts,
+              path: opts.path + "/parts/" + idx,
+            });
+          // In Zod 4, template literal parts must have a defined pattern property.
+          // We cast to the expected type since we know the runtime behavior is correct.
+          return schema as z.core.$ZodTemplateLiteralPart;
+        }),
+        /* c8 ignore next 2 -- TS */
+        typeof error === "string"
+          ? error
+          : {
+              ...error,
+              ...(shape.format ? { format: shape.format } : {}),
+            },
+      ),
+      shape,
+      opts,
     );
   },
 
-  symbol: (shape, opts) => z.symbol(getError(shape, opts)),
+  symbol: (shape, opts) =>
+    getCustomChecks(z.symbol(getError(shape, opts)), shape, opts),
 
   tuple: ((shape: SzTuple, opts: DezerializerOptions) => {
     let i = z.tuple(
@@ -608,7 +627,11 @@ const dezerializers = {
   }) as any,
 
   enum: ((shape: SzEnum, opts: DezerializerOptions) =>
-    z.enum(shape.values, getError(shape, opts))) as any,
+    getCustomChecks(
+      z.enum(shape.values, getError(shape, opts)),
+      shape,
+      opts,
+    )) as any,
 
   union: ((shape: SzUnion, opts: DezerializerOptions) => {
     const i = z.union(
@@ -686,7 +709,7 @@ const dezerializers = {
         }),
     );
     opts.pathToSchema.set(opts.path, i);
-    return i;
+    return getCustomChecks(i, shape, opts);
   }) as any,
   catch: ((shape: SzCatch, opts: DezerializerOptions) => {
     let base =
@@ -698,7 +721,7 @@ const dezerializers = {
 
     base = base.catch(shape.value);
     opts.pathToSchema.set(opts.path, base);
-    return base;
+    return getCustomChecks(base, shape, opts);
   }) as any,
   transform: (shape: SzTransform, opts: DezerializerOptions) => {
     if (!opts.transforms || !(shape.name in opts.transforms)) {
@@ -706,7 +729,11 @@ const dezerializers = {
         "Must supply transforms for the given transform name, " + shape.name,
       );
     }
-    return z.transform(opts.transforms[shape.name]);
+    return getCustomChecks(
+      z.transform(opts.transforms[shape.name]),
+      shape,
+      opts,
+    );
   },
   codec: (shape: SzCodec, opts: DezerializerOptions) => {
     const codec = opts.codecs?.[shape.name];
@@ -716,16 +743,20 @@ const dezerializers = {
       );
     }
 
-    return z.codec(
-      d(shape.input, {
-        ...opts,
-        path: opts.path + "/input",
-      }),
-      d(shape.output, {
-        ...opts,
-        path: opts.path + "/output",
-      }),
-      codec,
+    return getCustomChecks(
+      z.codec(
+        d(shape.input, {
+          ...opts,
+          path: opts.path + "/input",
+        }),
+        d(shape.output, {
+          ...opts,
+          path: opts.path + "/output",
+        }),
+        codec,
+      ),
+      shape,
+      opts,
     );
   },
   instanceof: (shape: SzInstanceOf, opts: DezerializerOptions) => {
@@ -735,7 +766,11 @@ const dezerializers = {
         "Must supply an instance constructor for the given name, " + shape.name,
       );
     }
-    return z.instanceof(Constructor);
+    const error = getError(shape, opts);
+    return z.instanceof(
+      Constructor,
+      typeof error === "string" ? { error } : error,
+    );
   },
   pipe: (shape: SzPipe, opts: DezerializerOptions) => {
     const base = (checkRef(shape.inner, opts) ||
