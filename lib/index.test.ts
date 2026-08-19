@@ -1998,7 +1998,7 @@ test("Nested recursion", () => {
   };
 
   const zer = zerialize(mainSchema);
-  console.log(JSON.stringify(zer, null, 2));
+  // console.log(JSON.stringify(zer, null, 2));
   expect(zer).toEqual(expectedShape);
   const dezer = dezerialize(zer);
 

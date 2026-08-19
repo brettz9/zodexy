@@ -1,5 +1,9 @@
 # CHANGES for zodexy
 
+## 0.26.1
+
+- fix(types and schema): add index signature and `id`, `title`, `description`, `deprecated` for metadata
+
 ## 0.26.0
 
 - fix(types): include schema extras on standalone `Sz*` types and expose their core shapes as `Sz*Base` types

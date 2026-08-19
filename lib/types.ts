@@ -372,6 +372,10 @@ export type SzDescription = { description: string };
 export type SzMeta = {
   meta: {
     [x: string]: unknown;
+    id?: string | undefined;
+    title?: string | undefined;
+    description?: string | undefined;
+    deprecated?: boolean | undefined;
   };
 };
 export type SzReadonly = { readonly: boolean };

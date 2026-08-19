@@ -324,7 +324,70 @@
           "isOptional": true
         },
         "description": { "type": "string", "isOptional": true },
-        "meta": { "type": "object", "isOptional": true, "properties": {} },
+        "meta": {
+          "type": "intersection",
+          "isOptional": true,
+          "right": {
+            "type": "record",
+            "key": { "type": "string" },
+            "value": {
+              "type": "unknown"
+            }
+          },
+          "left": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "union",
+                "isOptional": true,
+                "options": [
+                  {
+                    "type": "undefined"
+                  },
+                  {
+                    "type": "string"
+                  }
+                ]
+              },
+              "title": {
+                "type": "union",
+                "isOptional": true,
+                "options": [
+                  {
+                    "type": "undefined"
+                  },
+                  {
+                    "type": "string"
+                  }
+                ]
+              },
+              "description": {
+                "type": "union",
+                "isOptional": true,
+                "options": [
+                  {
+                    "type": "undefined"
+                  },
+                  {
+                    "type": "string"
+                  }
+                ]
+              },
+              "deprecated": {
+                "type": "union",
+                "isOptional": true,
+                "options": [
+                  {
+                    "type": "undefined"
+                  },
+                  {
+                    "type": "boolean"
+                  }
+                ]
+              }
+            }
+          }
+        },
         "readonly": { "type": "boolean", "isOptional": true }
       }
     },
