@@ -2,6 +2,21 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <script type="importmap">
+      {
+        "imports": {
+          "prismjs/themes/prism.min.css": "./vendor/prismjs/themes/prism.min.css",
+          "@webcoder49/code-input": "./vendor/@webcoder49/code-input/esm/code-input.mjs",
+          "@webcoder49/code-input/plugins/indent.mjs": "./vendor/@webcoder49/code-input/esm/plugins/indent.mjs",
+          "@webcoder49/code-input/code-input.min.css": "./vendor/@webcoder49/code-input/code-input.min.css"
+        }
+      }
+    </script>
+    <link rel="stylesheet" href="./vendor/prismjs/themes/prism.css" />
+    <!-- Toward getting ESM instead: https://github.com/PrismJS/prism/pull/3704 -->
+    <!-- Toward getting better ESM: https://github.com/WebCoder49/code-input/issues/190 -->
+    <script src="./vendor/prismjs/components/prism-core.js"></script>
+    <script src="./vendor/prismjs/plugins/autoloader/prism-autoloader.min.js"></script>
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Zodexy Demo</title>

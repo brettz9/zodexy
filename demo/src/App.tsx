@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import z from "zod";
 import { dezerialize, SzType, zerialize } from "zodexy";
 
@@ -14,6 +14,30 @@ const DEFAULT_OBJ_VALUE = `{
 export function App() {
   const [zodValue, setZodValue] = useState(DEFAULT_ZOD_VALUE);
   const [objValue, setObjValue] = useState(DEFAULT_OBJ_VALUE);
+  const zodCodeInputRef = useRef<HTMLCodeInputElement | null>(null);
+  const objCodeInputRef = useRef<HTMLCodeInputElement | null>(null);
+  const zodexyCodeRef = useRef<HTMLElement | null>(null);
+  const resultCodeRef = useRef<HTMLElement | null>(null);
+
+  useEffect(() => {
+    const codeInputElement = zodCodeInputRef.current;
+    if (!codeInputElement) {
+      return;
+    }
+    const handleInput = () => setZodValue(codeInputElement.value);
+    codeInputElement.addEventListener("input", handleInput);
+    return () => codeInputElement.removeEventListener("input", handleInput);
+  }, []);
+
+  useEffect(() => {
+    const codeInputElement = objCodeInputRef.current;
+    if (!codeInputElement) {
+      return;
+    }
+    const handleInput = () => setObjValue(codeInputElement.value);
+    codeInputElement.addEventListener("input", handleInput);
+    return () => codeInputElement.removeEventListener("input", handleInput);
+  }, []);
 
   const zodexyValue = useMemo<SzType | null>(() => {
     try {
@@ -37,6 +61,18 @@ export function App() {
 
   console.log(result);
 
+  useEffect(() => {
+    if (zodexyCodeRef.current) {
+      Prism.highlightElement(zodexyCodeRef.current);
+    }
+  }, [zodexyValue]);
+
+  useEffect(() => {
+    if (resultCodeRef.current) {
+      Prism.highlightElement(resultCodeRef.current);
+    }
+  }, [result]);
+
   return (
     <div className="app">
       <p>
@@ -52,15 +88,23 @@ export function App() {
       </p>
       <div className="playground">
         <label>zod schema</label>
-        <textarea
-          cols={120}
-          rows={10}
-          value={zodValue}
-          onChange={(event) => setZodValue(event.target.value)}
-        />
+        <code-input language="javascript" ref={zodCodeInputRef}>
+          <textarea
+            data-code-input-fallback=""
+            cols={120}
+            rows={10}
+            defaultValue={zodValue}
+          />
+        </code-input>
         {zodexyValue && (
-          <pre>
-            <code>{JSON.stringify(zodexyValue, null, 2)}</code>
+          <pre className="language-json">
+            <code
+              className="language-json"
+              key={JSON.stringify(zodexyValue)}
+              ref={zodexyCodeRef}
+            >
+              {JSON.stringify(zodexyValue, null, 2)}
+            </code>
           </pre>
         )}
 
@@ -70,15 +114,23 @@ export function App() {
         </p>
 
         <label>value to validate</label>
-        <textarea
-          cols={120}
-          rows={10}
-          value={objValue}
-          onChange={(event) => setObjValue(event.target.value)}
-        />
+        <code-input language="json" ref={objCodeInputRef}>
+          <textarea
+            data-code-input-fallback=""
+            cols={120}
+            rows={10}
+            defaultValue={objValue}
+          />
+        </code-input>
         {result && (
-          <pre>
-            <code>{JSON.stringify(result, null, 2)}</code>
+          <pre className="language-json">
+            <code
+              className="language-json"
+              key={JSON.stringify(result)}
+              ref={resultCodeRef}
+            >
+              {JSON.stringify(result, null, 2)}
+            </code>
           </pre>
         )}
       </div>
