@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "tsc": "tsc",
     "build-lib": "cd ../lib && pnpm build",
     "build": "pnpm build-lib && tsc -b && vite build",
     "preview": "vite preview"
