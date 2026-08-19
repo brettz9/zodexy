@@ -31,7 +31,6 @@ import {
   SzString,
   SzNumber,
   SzSymbol,
-  SzExtras,
   SzKey,
   InstanceConstructor,
 } from "./types.js";
@@ -74,7 +73,7 @@ export type Zerialize<T extends ZodTypes> =
           ? Zerialize<I extends ZodTypes ? I : never> & SzReadonly
           : // Primitives
             T extends IsZodPrimitive<T>
-            ? { type: PrimitiveMap[ZTypeName<T>] }
+            ? Extract<SzPrimitive, { type: PrimitiveMap[ZTypeName<T>] }>
             : //
               T extends z.ZodLiteral<infer T>
               ? SzLiteral<T>
@@ -120,11 +119,11 @@ export type Zerialize<T extends ZodTypes> =
                               >
                             ? SzRecord<
                                 Key extends z.ZodString
-                                  ? SzString & SzExtras
+                                  ? SzString
                                   : Key extends z.ZodNumber
-                                    ? SzNumber & SzExtras
+                                    ? SzNumber
                                     : Key extends z.ZodSymbol
-                                      ? SzSymbol & SzExtras
+                                      ? SzSymbol
                                       : Key extends z.ZodLiteral<
                                             infer L extends
                                               | string
@@ -134,9 +133,9 @@ export type Zerialize<T extends ZodTypes> =
                                               | null
                                               | undefined
                                           >
-                                        ? SzLiteral<L> & SzExtras
+                                        ? SzLiteral<L>
                                         : Key extends z.ZodEnum<infer E>
-                                          ? SzEnum<E> & SzExtras
+                                          ? SzEnum<E>
                                           : SzKey,
                                 Value extends ZodTypes
                                   ? Zerialize<Value>
@@ -315,7 +314,7 @@ const getCustomChecksAndErrors = (
         // May be a refinement
         return null;
       })
-      .filter(Boolean);
+      .filter((check): check is { name: string } => check !== null);
   }
 
   let customError;

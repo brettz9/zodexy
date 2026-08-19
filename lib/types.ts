@@ -1,6 +1,6 @@
 import { ValueOf } from "type-fest";
 
-export type SzNumber = {
+export type SzNumberBase = {
   type: "number";
   coerce?: boolean;
   min?: number;
@@ -10,7 +10,9 @@ export type SzNumber = {
   multipleOf?: number;
   format?: typeof NUMBER_FORMATS extends Set<infer T> ? T : never;
 };
-export type SzBigInt = {
+export type SzNumber = SzNumberBase & SzExtras;
+
+export type SzBigIntBase = {
   type: "bigInt";
   coerce?: boolean;
   min?: string;
@@ -20,6 +22,7 @@ export type SzBigInt = {
   multipleOf?: string;
   format?: "int64" | "uint64";
 };
+export type SzBigInt = SzBigIntBase & SzExtras;
 
 export const NUMBER_FORMATS = new Set([
   "int32",
@@ -59,7 +62,7 @@ export const STRING_KINDS = new Set([
   // "uppercase", // Doesn't appear to have enough data to serialize
 ] as const);
 
-export type SzString = {
+export type SzStringBase = {
   type: "string";
   coerce?: boolean;
   min?: number;
@@ -109,8 +112,9 @@ export type SzString = {
         kind: typeof STRING_KINDS extends Set<infer T> ? T : never;
       }
   );
+export type SzString = SzStringBase & SzExtras;
 
-export type SzDate = {
+export type SzDateBase = {
   type: "date";
   coerce?: boolean;
   min?: number;
@@ -118,29 +122,41 @@ export type SzDate = {
   minInclusive?: boolean;
   maxInclusive?: boolean;
 };
+export type SzDate = SzDateBase & SzExtras;
 
-export type SzTemplateLiteral = {
+export type SzTemplateLiteralBase = {
   type: "templateLiteral";
   parts: (string | SzType)[];
   format?: string;
 };
+export type SzTemplateLiteral = SzTemplateLiteralBase & SzExtras;
 
-export type SzFile = {
+export type SzFileBase = {
   type: "file";
   min?: number;
   max?: number;
   mime?: string[];
 };
+export type SzFile = SzFileBase & SzExtras;
 
-export type SzBoolean = { type: "boolean"; coerce?: boolean };
-export type SzNaN = { type: "nan" };
-export type SzUndefined = { type: "undefined" };
-export type SzNull = { type: "null" };
-export type SzAny = { type: "any" };
-export type SzUnknown = { type: "unknown" };
-export type SzNever = { type: "never" };
-export type SzVoid = { type: "void" };
-export type SzSymbol = { type: "symbol" };
+export type SzBooleanBase = { type: "boolean"; coerce?: boolean };
+export type SzBoolean = SzBooleanBase & SzExtras;
+export type SzNaNBase = { type: "nan" };
+export type SzNaN = SzNaNBase & SzExtras;
+export type SzUndefinedBase = { type: "undefined" };
+export type SzUndefined = SzUndefinedBase & SzExtras;
+export type SzNullBase = { type: "null" };
+export type SzNull = SzNullBase & SzExtras;
+export type SzAnyBase = { type: "any" };
+export type SzAny = SzAnyBase & SzExtras;
+export type SzUnknownBase = { type: "unknown" };
+export type SzUnknown = SzUnknownBase & SzExtras;
+export type SzNeverBase = { type: "never" };
+export type SzNever = SzNeverBase & SzExtras;
+export type SzVoidBase = { type: "void" };
+export type SzVoid = SzVoidBase & SzExtras;
+export type SzSymbolBase = { type: "symbol" };
+export type SzSymbol = SzSymbolBase & SzExtras;
 
 export type SzPrimitive =
   | SzBoolean
@@ -158,14 +174,16 @@ export type SzPrimitive =
   | SzVoid
   | SzSymbol;
 
-export type SzLiteral<T> = { type: "literal"; values: T };
-export type SzArray<T extends SzType = SzType> = {
+export type SzLiteralBase<T> = { type: "literal"; values: T };
+export type SzLiteral<T> = SzLiteralBase<T> & SzExtras;
+export type SzArrayBase<T extends SzType = SzType> = {
   type: "array";
   element: T;
   minLength?: number;
   maxLength?: number;
 };
-export type SzObject<
+export type SzArray<T extends SzType = SzType> = SzArrayBase<T> & SzExtras;
+export type SzObjectBase<
   T extends Record<string, SzType> = Record<string, SzType>,
   U extends SzType = SzType,
 > = {
@@ -173,15 +191,21 @@ export type SzObject<
   properties: T;
   catchall?: U;
 };
+export type SzObject<
+  T extends Record<string, SzType> = Record<string, SzType>,
+  U extends SzType = SzType,
+> = SzObjectBase<T, U> & SzExtras;
 
-export type SzUnion<Options extends [SzType, ...SzType[]] = [SzType]> = {
+export type SzUnionBase<Options extends [SzType, ...SzType[]] = [SzType]> = {
   type: "union";
   options: Options;
 };
+export type SzUnion<Options extends [SzType, ...SzType[]] = [SzType]> =
+  SzUnionBase<Options> & SzExtras;
 export type SzDiscriminatedUnionOption<Discriminator extends string> = SzObject<
   Record<string, SzType>
 >;
-export type SzDiscriminatedUnion<
+export type SzDiscriminatedUnionBase<
   Discriminator extends string = string,
   Options extends readonly SzType[] = readonly SzType[],
 > = {
@@ -189,7 +213,11 @@ export type SzDiscriminatedUnion<
   discriminator: Discriminator;
   options: Options;
 };
-export type SzIntersection<
+export type SzDiscriminatedUnion<
+  Discriminator extends string = string,
+  Options extends readonly SzType[] = readonly SzType[],
+> = SzDiscriminatedUnionBase<Discriminator, Options> & SzExtras;
+export type SzIntersectionBase<
   Left extends SzType = SzType,
   Right extends SzType = SzType,
 > = {
@@ -197,18 +225,27 @@ export type SzIntersection<
   left: Left;
   right: Right;
 };
-export type SzXor<Options extends [SzType, ...SzType[]] = [SzType]> = {
+export type SzIntersection<
+  Left extends SzType = SzType,
+  Right extends SzType = SzType,
+> = SzIntersectionBase<Left, Right> & SzExtras;
+export type SzXorBase<Options extends [SzType, ...SzType[]] = [SzType]> = {
   type: "xor";
   options: Options;
 };
-export type SzTuple<
+export type SzXor<Options extends [SzType, ...SzType[]] = [SzType]> =
+  SzXorBase<Options> & SzExtras;
+export type SzTupleBase<
   Items extends [SzType, ...SzType[]] | [] = [SzType, ...SzType[]] | [],
 > = {
   type: "tuple";
   items: Items;
   rest?: SzType;
 };
-export type SzRecord<
+export type SzTuple<
+  Items extends [SzType, ...SzType[]] | [] = [SzType, ...SzType[]] | [],
+> = SzTupleBase<Items> & SzExtras;
+export type SzRecordBase<
   Key extends SzKey = SzKey,
   Value extends SzType = SzType,
 > = {
@@ -216,7 +253,11 @@ export type SzRecord<
   key: Key;
   value: Value;
 };
-export type SzLooseRecord<
+export type SzRecord<
+  Key extends SzKey = SzKey,
+  Value extends SzType = SzType,
+> = SzRecordBase<Key, Value> & SzExtras;
+export type SzLooseRecordBase<
   Key extends SzKey = SzKey,
   Value extends SzType = SzType,
 > = {
@@ -224,20 +265,30 @@ export type SzLooseRecord<
   key: Key;
   value: Value;
 };
-export type SzMap<Key extends SzType, Value extends SzType> = {
+export type SzLooseRecord<
+  Key extends SzKey = SzKey,
+  Value extends SzType = SzType,
+> = SzLooseRecordBase<Key, Value> & SzExtras;
+export type SzMapBase<Key extends SzType, Value extends SzType> = {
   type: "map";
   key: Key;
   value: Value;
   min?: number;
   max?: number;
 };
-export type SzSet<T extends SzType = SzType> = {
+export type SzMap<Key extends SzType, Value extends SzType> = SzMapBase<
+  Key,
+  Value
+> &
+  SzExtras;
+export type SzSetBase<T extends SzType = SzType> = {
   type: "set";
   value: T;
   minSize?: number;
   maxSize?: number;
 };
-export type SzEnum<
+export type SzSet<T extends SzType = SzType> = SzSetBase<T> & SzExtras;
+export type SzEnumBase<
   Values extends Readonly<
     Record<string, import("zod/v4/core").util.EnumValue>
   > = Readonly<Record<string, import("zod/v4/core").util.EnumValue>>,
@@ -245,48 +296,73 @@ export type SzEnum<
   type: "enum";
   values: Values;
 };
+export type SzEnum<
+  Values extends Readonly<
+    Record<string, import("zod/v4/core").util.EnumValue>
+  > = Readonly<Record<string, import("zod/v4/core").util.EnumValue>>,
+> = SzEnumBase<Values> & SzExtras;
 
-export type SzPromise<T extends SzType = SzType> = {
+export type SzPromiseBase<T extends SzType = SzType> = {
   type: "promise";
   value: T;
 };
+export type SzPromise<T extends SzType = SzType> = SzPromiseBase<T> & SzExtras;
 
-export type SzFunction<T extends SzTuple, U extends SzType> = {
+export type SzFunctionBase<T extends SzTuple, U extends SzType> = {
   type: "function";
   input: T;
   output: U;
 };
+export type SzFunction<T extends SzTuple, U extends SzType> = SzFunctionBase<
+  T,
+  U
+> &
+  SzExtras;
 
-export type SzCatch<T extends SzType = SzType> = {
+export type SzCatchBase<T extends SzType = SzType> = {
   type: "catch";
   value: any;
   innerType: T;
 };
+export type SzCatch<T extends SzType = SzType> = SzCatchBase<T> & SzExtras;
 
-export type SzPipe<T extends SzType = SzType, U extends SzType = SzType> = {
+export type SzPipeBase<T extends SzType = SzType, U extends SzType = SzType> = {
   type: "pipe";
   inner: T;
   outer: U;
 };
+export type SzPipe<
+  T extends SzType = SzType,
+  U extends SzType = SzType,
+> = SzPipeBase<T, U> & SzExtras;
 
-export type SzCodec<T extends SzType = SzType, U extends SzType = SzType> = {
+export type SzCodecBase<
+  T extends SzType = SzType,
+  U extends SzType = SzType,
+> = {
   type: "codec";
   name: string;
   input: T;
   output: U;
 };
+export type SzCodec<
+  T extends SzType = SzType,
+  U extends SzType = SzType,
+> = SzCodecBase<T, U> & SzExtras;
 
-export type SzInstanceOf = {
+export type SzInstanceOfBase = {
   type: "instanceof";
   name: string;
 };
+export type SzInstanceOf = SzInstanceOfBase & SzExtras;
 
 export type InstanceConstructor = new (...args: any[]) => any;
 
-export type SzTransform = {
+export type SzTransformBase = {
   type: "transform";
   name: string;
 };
+export type SzTransform = SzTransformBase & SzExtras;
 
 // Modifiers
 export type SzNullable = { isNullable: boolean };
@@ -322,17 +398,15 @@ export type SzExtras = Partial<
 >;
 
 // Conjunctions
-export type SzKey = (
+export type SzKey =
   | SzString
   | SzNumber
   | SzSymbol
   | SzLiteral<string | number | bigint | boolean | null | undefined>
-  | SzEnum<any>
-) &
-  SzExtras;
+  | SzEnum<any>;
 export type SzDefaultOrNullable = SzDefault<any> | SzNullable;
 
-export type SzType = (
+export type SzType =
   | SzPrimitive
   | SzLiteral<any>
   | SzTemplateLiteral
@@ -354,9 +428,7 @@ export type SzType = (
   | SzPipe<any, any>
   | SzCodec<any, any>
   | SzInstanceOf
-  | SzTransform
-) &
-  SzExtras;
+  | SzTransform;
 
 export type SzUnionize<T extends SzType | SzRef> =
   | T

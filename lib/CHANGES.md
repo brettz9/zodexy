@@ -1,5 +1,9 @@
 # CHANGES for zodexy
 
+## 0.26.0
+
+- fix(types): include schema extras on standalone `Sz*` types and expose their core shapes as `Sz*Base` types
+
 ## 0.25.0
 
 - feat: ensure custom checks and errors are applied where supported

@@ -1,7 +1,13 @@
 import fs from "fs";
-import { expect, test } from "vitest";
+import { expect, expectTypeOf, test } from "vitest";
 import { z } from "zod";
-import { SzCatch, SzEnum } from "./types.js";
+import {
+  SzCatch,
+  SzEnum,
+  SzExtras,
+  SzLiteral,
+  SzLiteralBase,
+} from "./types.js";
 import { ZodTypes } from "./zod-types.js";
 
 import { dezerialize, SzType, zerialize, Zerialize } from "./index.js";
@@ -15,6 +21,23 @@ const p = <Schema extends ZodTypes, Shape extends SzType = Zerialize<Schema>>(
   schema: Schema,
   shape: Shape,
 ): [Schema, Shape] => [schema, shape];
+
+test("standalone schema types include extras", () => {
+  const literal: SzLiteral<"value"> = {
+    type: "literal",
+    values: "value",
+    description: "A literal value",
+  };
+  const literalBase: SzLiteralBase<"value"> = {
+    type: "literal",
+    values: "value",
+  };
+
+  expect(literal.description).toBe("A literal value");
+  expectTypeOf<SzType>().toExtend<SzExtras>();
+  expectTypeOf<Zerialize<z.ZodString>>().toExtend<SzExtras>();
+  expectTypeOf(literalBase).not.toHaveProperty("description");
+});
 
 enum Fruits {
   Apple,
@@ -2120,7 +2143,7 @@ test("catch (function)", () => {
     },
   };
 
-  const serialized = zerialize(schema as any) as SzCatch;
+  const serialized = zerialize(schema as any) as unknown as SzCatch;
   expect(typeof serialized.value).to.equal("number");
   expect({
     ...serialized,
