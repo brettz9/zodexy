@@ -182,5 +182,5 @@ or target the whole object or individual properties.
 
 ## Other projects
 
-- [json-schema-to-zodex](https://github.com/brettz9/json-schema-to-zodex)
+- [json-schema-to-zodexy](https://github.com/brettz9/json-schema-to-zodexy)
 - [zod-to-json-schema](https://github.com/StefanTerdell/zod-to-json-schema)
