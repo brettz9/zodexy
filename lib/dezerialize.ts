@@ -38,6 +38,7 @@ import {
   SzUnknown,
   SzVoid,
   SzRef,
+  SzDocument,
   NUMBER_FORMATS,
   InstanceConstructor,
 } from "./types.js";
@@ -60,7 +61,7 @@ export type DezerializerOptions = {
   path: string;
   pathToSchema: Map<string, ZodTypes>;
   $refs: [z.ZodLazy<any>, string][];
-  originalShape: SzType;
+  originalShape: SzDocument;
 };
 
 type DistributiveOmit<T, K extends keyof any> = T extends any
@@ -69,7 +70,7 @@ type DistributiveOmit<T, K extends keyof any> = T extends any
 type OmitKey<T, K> = DistributiveOmit<T, keyof K>;
 
 // Types must match the exported dezerialize function's implementation
-export type Dezerialize<T extends SzType | SzRef> = T extends SzRef
+export type Dezerialize<T extends SzDocument | SzRef> = T extends SzRef
   ? any
   : // Modifier types
     T extends SzOptional
@@ -222,7 +223,7 @@ type DezerializersMap = {
   [T in SzType["type"]]: (
     shape: Extract<SzType, { type: T }>,
     opts: DezerializerOptions,
-  ) => ZodTypes; //Dezerialize<Extract<SzType, { type: T }>>;
+  ) => ZodTypes; //Dezerialize<Extract<SzDocument, { type: T }>>;
 };
 
 function checkRef(item: SzType, opts: DezerializerOptions) {
@@ -865,7 +866,7 @@ function resolvePointer(obj: any, pointer: string): any {
 }
 
 export function dezerialize(
-  shape: SzType,
+  shape: SzDocument,
   opts: Partial<DezerializerOptions> = {},
 ): ZodTypes {
   if (!("path" in opts)) {

@@ -1,5 +1,9 @@
 # CHANGES for zodexy
 
+## 0.27.0
+
+- feat: accept `schema` string on `zerialize` to build new `$zodexySchema` property
+
 ## 0.26.1
 
 - fix(types and schema): add index signature and `id`, `title`, `description`, `deprecated` for metadata

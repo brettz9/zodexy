@@ -434,6 +434,10 @@ export type SzType =
   | SzInstanceOf
   | SzTransform;
 
+export type SzDocument<T extends SzType = SzType> = T & {
+  $zodexySchema?: string;
+};
+
 export type SzUnionize<T extends SzType | SzRef> =
   | T
   | (T extends SzArray<infer T>

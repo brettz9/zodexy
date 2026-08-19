@@ -24,6 +24,7 @@ import {
   SzReadonly,
   SzPrimitive,
   SzType,
+  SzDocument,
   // SzUnknown,
   // NUMBER_FORMATS,
   STRING_KINDS,
@@ -269,6 +270,7 @@ type ZerializerOptions = {
   };
   codecs?: Record<string, CodecFunctions>;
   instances?: Record<string, InstanceConstructor>;
+  schema?: string | null;
   currentPath: string[];
   seenObjects: WeakMap<ZodTypes, string>;
 };
@@ -1053,7 +1055,7 @@ export function zerializeRefs<T extends ZodTypes>(
 export function zerialize<T extends ZodTypes>(
   schema: T,
   opts: Partial<ZerializerOptions> = {},
-): Zerialize<T> {
+): SzDocument<Zerialize<T>> {
   if (!opts.currentPath) {
     opts.currentPath = [];
   }
@@ -1061,5 +1063,19 @@ export function zerialize<T extends ZodTypes>(
     opts.seenObjects = new WeakMap();
   }
 
-  return zerializeRefs(schema, opts as ZerializerOptions) as Zerialize<T>;
+  const zerialized = zerializeRefs(
+    schema,
+    opts as ZerializerOptions,
+  ) as SzDocument<Zerialize<T>>;
+
+  if (Object.hasOwn(opts, "schema")) {
+    if (opts.schema !== null) {
+      zerialized.$zodexySchema = opts.schema;
+    }
+  } else {
+    zerialized.$zodexySchema =
+      "https://github.com/brettz9/zodexy/releases/tag/v0.27.0";
+  }
+
+  return zerialized;
 }

@@ -10,14 +10,25 @@ import {
 } from "./types.js";
 import { ZodTypes } from "./zod-types.js";
 
-import { dezerialize, SzType, zerialize, Zerialize } from "./index.js";
+import {
+  dezerialize,
+  SzType,
+  SzDocument,
+  zerialize,
+  Zerialize,
+} from "./index.js";
+
+const $zodexySchema = "https://github.com/brettz9/zodexy/releases/tag/v0.27.0";
 
 const zodexySchemaJSON = JSON.parse(
   fs.readFileSync("./schema.zodexy.json", "utf-8"),
 );
 const zodexySchema = dezerialize(zodexySchemaJSON);
 
-const p = <Schema extends ZodTypes, Shape extends SzType = Zerialize<Schema>>(
+const p = <
+  Schema extends ZodTypes,
+  Shape extends SzDocument = Zerialize<Schema>,
+>(
   schema: Schema,
   shape: Shape,
 ): [Schema, Shape] => [schema, shape];
@@ -643,12 +654,18 @@ test.each([
     values: [42],
   }),
 ] as const)("zerialize %#", (schema, shape) => {
-  const zer = zerialize(schema);
-  expect(zer).toEqual(shape);
-  const dezer = dezerialize(shape) as any;
+  const shapeWithSchema = {
+    $zodexySchema,
+    ...shape,
+  };
+  const zer = zerialize(schema, {
+    schema: $zodexySchema,
+  });
+  expect(zer).toEqual(shapeWithSchema);
+  const dezer = dezerialize(shapeWithSchema) as any;
   const rezer = zerialize(dezer);
   expect(rezer).toEqual(zerialize(schema));
-  const parsed = zodexySchema.safeParse(shape);
+  const parsed = zodexySchema.safeParse(shapeWithSchema);
   if (!parsed.success) {
     console.log(parsed);
   }
@@ -669,6 +686,17 @@ test.each([
   expect(parsed.success).to.equal(true);
 });
 
+test("Null schema", () => {
+  const schema = z.boolean();
+  const shape = {
+    type: "boolean",
+  };
+  const zer = zerialize(schema, {
+    schema: null,
+  });
+  expect(zer).toEqual(shape);
+});
+
 test("custom errors", () => {
   const errors = {
     someKey: () => {
@@ -678,6 +706,7 @@ test("custom errors", () => {
   const schema = z.string({ error: errors.someKey });
 
   const expectedShape = {
+    $zodexySchema,
     type: "string",
     error: {
       key: "someKey",
@@ -739,9 +768,10 @@ test("custom checks and errors on all supported types", () => {
   for (const [schema, baseShape] of cases) {
     const expectedShape = {
       ...baseShape,
+      $zodexySchema,
       checks: [{ name: "customCheck" }],
       error: { key: "customError" },
-    } as SzType;
+    } as SzDocument;
     const shape = zerialize(schema, options);
     expect(shape).toEqual(expectedShape);
     expect(zerialize(dezerialize(shape, options), options)).toEqual(
@@ -795,8 +825,9 @@ test("custom checks on supported special types", () => {
   for (const [schema, baseShape] of cases) {
     const expectedShape = {
       ...baseShape,
+      $zodexySchema,
       checks: [{ name: "customCheck" }],
-    } as SzType;
+    } as SzDocument;
     const shape = zerialize(schema, options);
     expect(shape).toEqual(expectedShape);
     expect(zerialize(dezerialize(shape, options), options)).toEqual(
@@ -805,6 +836,7 @@ test("custom checks on supported special types", () => {
   }
 
   const instanceShape = {
+    $zodexySchema,
     type: "instanceof",
     name: "Date",
     error: { key: "customError" },
@@ -834,6 +866,7 @@ test("discriminated union", () => {
   // ({ name: "Gregor" }) satisfies InfType;
 
   expect(shape).toEqual({
+    $zodexySchema,
     type: "discriminatedUnion",
     discriminator: "name",
     options: [
@@ -877,7 +910,7 @@ test("discriminated union", () => {
   // }>();
 
   expect(
-    (dezerialize(shape as SzType) as z.ZodDefault<any>).def.defaultValue,
+    (dezerialize(shape as SzDocument) as z.ZodDefault<any>).def.defaultValue,
   ).toEqual({
     name: "Lea",
     reach: 42,
@@ -895,7 +928,7 @@ test("discriminated union", () => {
 //   expect(shape).toEqual({
 //     type: "boolean"
 //   });
-//   expect(dezerialize(shape as SzType).parse("yes")).toEqual(true);
+//   expect(dezerialize(shape as SzDocument).parse("yes")).toEqual(true);
 
 //   const parsed = zodexySchema.safeParse(shape);
 //   expect(parsed.success).to.equal(true);
@@ -906,10 +939,11 @@ test("coerce (number)", () => {
   expect(schema.parse("42")).toEqual(42);
   const shape = zerialize(schema);
   expect(shape).toEqual({
+    $zodexySchema,
     type: "number",
     coerce: true,
   });
-  expect(dezerialize(shape as SzType).parse("42")).toEqual(42);
+  expect(dezerialize(shape as SzDocument).parse("42")).toEqual(42);
 
   const parsed = zodexySchema.safeParse(shape);
   expect(parsed.success).to.equal(true);
@@ -920,10 +954,11 @@ test("coerce (bigint)", () => {
   expect(schema.parse("42")).toEqual(42n);
   const shape = zerialize(schema);
   expect(shape).toEqual({
+    $zodexySchema,
     type: "bigInt",
     coerce: true,
   });
-  expect(dezerialize(shape as SzType).parse("42")).toEqual(42n);
+  expect(dezerialize(shape as SzDocument).parse("42")).toEqual(42n);
 
   const parsed = zodexySchema.safeParse(shape);
   expect(parsed.success).to.equal(true);
@@ -934,10 +969,11 @@ test("coerce (date)", () => {
   expect(schema.parse("1999-01-01")).toEqual(new Date("1999-01-01"));
   const shape = zerialize(schema);
   expect(shape).toEqual({
+    $zodexySchema,
     type: "date",
     coerce: true,
   });
-  expect(dezerialize(shape as SzType).parse("1999-01-01")).toEqual(
+  expect(dezerialize(shape as SzDocument).parse("1999-01-01")).toEqual(
     new Date("1999-01-01"),
   );
   const parsed = zodexySchema.safeParse(shape);
@@ -949,10 +985,11 @@ test("coerce (string)", () => {
   expect(schema.parse(42)).toEqual("42");
   const shape = zerialize(schema);
   expect(shape).toEqual({
+    $zodexySchema,
     type: "string",
     coerce: true,
   });
-  expect(dezerialize(shape as SzType).parse(42)).toEqual("42");
+  expect(dezerialize(shape as SzDocument).parse(42)).toEqual("42");
 
   const parsed = zodexySchema.safeParse(shape);
   expect(parsed.success).to.equal(true);
@@ -963,10 +1000,11 @@ test("coerce (boolean)", () => {
   expect(schema.parse(0)).toEqual(false);
   const shape = zerialize(schema);
   expect(shape).toEqual({
+    $zodexySchema,
     type: "boolean",
     coerce: true,
   });
-  expect(dezerialize(shape as SzType).parse(0)).toEqual(false);
+  expect(dezerialize(shape as SzDocument).parse(0)).toEqual(false);
   const parsed = zodexySchema.safeParse(shape);
   expect(parsed.success).to.equal(true);
 });
@@ -979,6 +1017,7 @@ test("codecs", () => {
   const codecs = { isoDate };
   const schema = z.codec(z.iso.datetime(), z.date(), isoDate);
   const expectedShape = {
+    $zodexySchema,
     type: "codec",
     name: "isoDate",
     input: { type: "string", kind: "datetime" },
@@ -1008,6 +1047,7 @@ test("instanceof", () => {
   const instances = { Example };
   const schema = z.instanceof(Example);
   const expectedShape = {
+    $zodexySchema,
     type: "instanceof",
     name: "Example",
   } as const;
@@ -1041,6 +1081,7 @@ test("preprocess", () => {
   const schema = z.preprocess(transforms.addFive, z.number());
 
   const expectedShape = {
+    $zodexySchema,
     inner: {
       type: "transform",
       name: "addFive",
@@ -1071,6 +1112,7 @@ test("bad transform", () => {
   const schema = z.number().transform(transforms.addFive);
 
   const expectedShape = {
+    $zodexySchema,
     inner: {
       type: "number",
     },
@@ -1103,6 +1145,7 @@ test("transforms", () => {
   const schema = z.number().transform(transforms.addFive);
 
   const expectedShape = {
+    $zodexySchema,
     inner: {
       type: "number",
     },
@@ -1131,6 +1174,7 @@ test("transforms", () => {
     .transform(transforms.addTwo);
 
   const expectedShape3 = {
+    $zodexySchema,
     inner: {
       inner: {
         type: "number",
@@ -1217,6 +1261,7 @@ test("named checks and transforms", () => {
     .check(checks["far too young"]);
 
   const expectedShape = {
+    $zodexySchema,
     checks: [{ name: "far too young" }],
     inner: {
       checks: [{ name: "not in future" }, { name: "far too old" }],
@@ -1283,6 +1328,7 @@ test("dezerialize checks without options", () => {
   const schema = z.date().check(checks["not in future"]);
 
   const expectedShape = {
+    $zodexySchema,
     checks: [{ name: "not in future" }],
     type: "date",
   };
@@ -1333,6 +1379,7 @@ test("recursive schemas (nested)", () => {
   });
 
   const expectedShape = {
+    $zodexySchema,
     type: "object",
     properties: {
       nested: {
@@ -1399,6 +1446,7 @@ test("recursive schemas", () => {
   // }); // passes
 
   const expectedShape = {
+    $zodexySchema,
     type: "object",
     properties: {
       name: {
@@ -1432,6 +1480,7 @@ test("recursive tuple schema", () => {
   ]);
 
   const expectedShape = {
+    $zodexySchema,
     items: [
       {
         type: "string",
@@ -1476,6 +1525,7 @@ test("recursive tuple schema", () => {
 test("Object with inner $ref", () => {
   const schema = z.promise(z.array(categorySchemaNested));
   const shape = {
+    $zodexySchema,
     type: "promise",
     value: {
       type: "array",
@@ -1544,6 +1594,7 @@ test("Large object with inner $ref", () => {
     ),
   ]);
   const shape = {
+    $zodexySchema,
     items: [
       {
         type: "string",
@@ -1734,6 +1785,7 @@ test("Nested recursion", () => {
   });
 
   const expectedShape = {
+    $zodexySchema,
     type: "object",
     properties: {
       limit: {
@@ -2018,6 +2070,7 @@ test("zod 4 recursion", () => {
     },
   });
   const expectedShape = {
+    $zodexySchema,
     type: "object",
     properties: {
       name: {
@@ -2051,6 +2104,7 @@ test("zod 4 recursion", () => {
   });
 
   const expectedShape2 = {
+    $zodexySchema,
     properties: {
       author: {
         properties: {
@@ -2084,6 +2138,7 @@ test("catch", () => {
   const schema = z.number().catch(42);
 
   const expectedShape = {
+    $zodexySchema,
     type: "catch",
     value: 42,
     innerType: {
@@ -2109,6 +2164,7 @@ test("catch (object)", () => {
   });
 
   const expectedShape = {
+    $zodexySchema,
     type: "catch",
     value: {
       abc: true,
@@ -2136,6 +2192,7 @@ test("catch (function)", () => {
   });
 
   const expectedShape = {
+    $zodexySchema,
     type: "catch",
     // value: 12345,
     innerType: {

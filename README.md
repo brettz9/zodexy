@@ -81,6 +81,14 @@ options:
           - "b"
 ```
 
+The optional `$zodexySchema` property identifies the schema and
+semantic vocabulary governing a Zodexy document. Its value MUST
+be an absolute URI. The URI MAY identify the complete Zodexy
+vocabulary, a versioned dialect, or a constrained profile.
+Consumers MUST NOT assume that the URI is fetched
+automatically. Unknown schema URIs SHOULD produce an explicit
+unsupported-schema diagnostic when schema enforcement is enabled.
+
 ## Options
 
 Both `zerialize` and `dezerialize` accept an options object with the
