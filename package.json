@@ -1,4 +1,5 @@
 {
+  "private": true,
   "name": "zodexy-workspace",
   "author": "Gregor Weber<mail@watwa.re>",
   "license": "MIT",
