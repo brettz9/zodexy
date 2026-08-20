@@ -4,11 +4,12 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
+    "predev": "pnpm copy",
     "dev": "vite",
     "tsc": "tsc",
-    "copy": "rm -Rf vendor && mkdir -p vendor/@webcoder49/code-input && cp -R node_modules/prismjs/ vendor/prismjs/ && cp -R node_modules/@webcoder49/code-input/ vendor/@webcoder49/code-input/",
+    "copy": "rm -Rf public/vendor && mkdir -p public/vendor/@webcoder49/code-input && cp -R node_modules/prismjs/ public/vendor/prismjs/ && cp -R node_modules/@webcoder49/code-input/ public/vendor/@webcoder49/code-input/",
     "build-lib": "cd ../lib && pnpm build",
-    "build": "pnpm build-lib && tsc -b && vite build",
+    "build": "pnpm build-lib && pnpm copy && tsc -b && vite build",
     "preview": "vite preview"
   },
   "dependencies": {
