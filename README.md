@@ -179,7 +179,7 @@ or target the whole object or individual properties.
 
 ## Caveats
 
-- `brand` is not supportable and omitted
+- `brand` is not supportable and is omitted
 - `lazy` type is unwrapped; `pipe` is unwrapped when no transforms are supplied
 - `catch` with a function can have its then-value serialized but it
   cannot then be deserialized back into using the original function
