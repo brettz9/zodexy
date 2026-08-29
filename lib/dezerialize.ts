@@ -19,6 +19,7 @@ import {
   SzEnum,
   SzPromise,
   SzPipe,
+  SzStringbool,
   SzCodec,
   SzInstanceOf,
   SzTransform,
@@ -57,6 +58,7 @@ export type DezerializerOptions = {
     [key: string]: (ctx: z.core.ParsePayload) => Promise<unknown> | unknown;
   };
   codecs?: Record<string, CodecFunctions>;
+  symbols?: symbol[];
   instances?: Record<string, InstanceConstructor>;
   path: string;
   pathToSchema: Map<string, ZodTypes>;
@@ -359,6 +361,8 @@ const dezerializers = {
                 /* c8 ignore next -- Guard */
               })
             : z.email();
+      } else if (shape.kind === "nanoid") {
+        s = "length" in shape ? z.nanoid({ length: shape.length }) : z.nanoid();
       } else if (shape.kind !== "json_string") {
         // Todo: how to get `json_string`?
         s = z[shape.kind]();
@@ -542,18 +546,42 @@ const dezerializers = {
 
   object: ((shape: SzObject, opts: DezerializerOptions) => {
     let i = z.object(
-      Object.fromEntries(
-        Object.entries(shape.properties).map(([key, value]) => {
-          return [
-            key,
-            checkRef(value, opts) ||
-              d(value as SzType, {
-                ...opts,
-                path: opts.path + "/properties/" + key,
-              }),
-          ];
-        }),
-      ),
+      {
+        ...Object.fromEntries(
+          Object.entries(shape.properties).map(([key, value]) => {
+            return [
+              key,
+              checkRef(value, opts) ||
+                d(value as SzType, {
+                  ...opts,
+                  path: opts.path + "/properties/" + key,
+                }),
+            ];
+          }),
+        ),
+        ...Object.fromEntries(
+          Object.entries(shape.symbols ?? {}).map(([key, value]) => {
+            if (!opts.symbols) {
+              throw new Error(
+                "A symbol key was specified, but no `symbols` option was found",
+              );
+            }
+            if (!(key in opts.symbols)) {
+              throw new Error(
+                "A symbol key was specified and a `symbols` option was found, but not at the specified index.",
+              );
+            }
+            return [
+              opts.symbols[Number(key)],
+              checkRef(value, opts) ||
+                d(value as SzType, {
+                  ...opts,
+                  path: opts.path + "/symbols/" + key,
+                }),
+            ];
+          }),
+        ),
+      },
       getError(shape, opts),
     ) as z.ZodObject<{
       [k: string]: ZodTypes;
@@ -773,7 +801,11 @@ const dezerializers = {
       typeof error === "string" ? { error } : error,
     );
   },
-  pipe: (shape: SzPipe, opts: DezerializerOptions) => {
+  pipe: (shape: SzPipe | SzStringbool, opts: DezerializerOptions) => {
+    if ("truthy" in shape) {
+      return z.stringbool({ truthy: shape.truthy, falsy: shape.falsy });
+    }
+
     const base = (checkRef(shape.inner, opts) ||
       d(shape.inner, {
         ...opts,

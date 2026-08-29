@@ -268,6 +268,7 @@ type ZerializerOptions = {
   transforms?: {
     [key: string]: (ctx: z.core.ParsePayload) => Promise<unknown> | unknown;
   };
+  symbols?: symbol[];
   codecs?: Record<string, CodecFunctions>;
   instances?: Record<string, InstanceConstructor>;
   schema?: string | null;
@@ -324,12 +325,14 @@ const getCustomChecksAndErrors = (
     const key = Object.entries(opts.errors ?? {}).find(([, func]) => {
       return func === def.error;
     })?.[0];
-    customError =
-      typeof key == "string"
-        ? { key }
-        : // Not supplying an issue should not be a problem for regular
-          //   wrapped string errors
-          def.error();
+    if (typeof key == "string" || typeof def.error == "function") {
+      customError =
+        typeof key == "string"
+          ? { key }
+          : // Not supplying an issue should not be a problem for regular
+            //   wrapped string errors
+            def.error();
+    }
   }
 
   return Object.assign(
@@ -553,6 +556,11 @@ const zerializers = {
                                   local: def.local,
                                 }
                               : {}),
+                            ...("length" in def
+                              ? {
+                                  length: def.length,
+                                }
+                              : {}),
                           }
                         : {}),
       },
@@ -767,6 +775,7 @@ const zerializers = {
   },
 
   object: (def, opts) => {
+    const ownPropertySymbols = Object.getOwnPropertySymbols(def.shape);
     return {
       type: "object",
       ...getCustomChecksAndErrors(def, opts),
@@ -778,6 +787,32 @@ const zerializers = {
               currentPath: [...opts.currentPath, "catchall"],
             }),
           }),
+      ...(ownPropertySymbols.length
+        ? {
+            symbols: Object.fromEntries(
+              ownPropertySymbols.map((symbol) => {
+                if (!opts.symbols) {
+                  throw new Error(
+                    "Symbol key present without `symbols` option",
+                  );
+                }
+                const index = opts.symbols.indexOf(symbol);
+                if (index === -1) {
+                  throw new Error(
+                    "Symbol key and `symbols` option both present but not key found",
+                  );
+                }
+                return [
+                  index,
+                  s(def.shape[symbol] as ZodTypes, {
+                    ...opts,
+                    currentPath: [...opts.currentPath, "symbols", index],
+                  }),
+                ];
+              }),
+            ),
+          }
+        : {}),
       properties: Object.fromEntries(
         Object.entries(def.shape).map(([key, schema]) => [
           key,
@@ -918,7 +953,20 @@ const zerializers = {
       // }),
     };
   },
-  pipe: (def, opts) => {
+  pipe: (def, opts, schema) => {
+    if ("truthy" in schema._zod.bag) {
+      const { truthy, falsy, case: cse } = schema._zod.bag;
+      return {
+        type: "pipe",
+        ...getCustomChecksAndErrors(def, opts),
+        inner: s(def.in, opts),
+        outer: s(def.out, opts),
+        truthy,
+        falsy,
+        case: cse,
+      };
+    }
+
     if (def.transform && def.reverseTransform) {
       const name = Object.entries(opts.codecs ?? {}).find(
         ([, codec]) =>

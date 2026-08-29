@@ -189,6 +189,7 @@ export type SzObjectBase<
 > = {
   type: "object";
   properties: T;
+  symbols?: T;
   catchall?: U;
 };
 export type SzObject<
@@ -335,6 +336,14 @@ export type SzPipe<
   T extends SzType = SzType,
   U extends SzType = SzType,
 > = SzPipeBase<T, U> & SzExtras;
+
+export type SzStringbool<
+  T extends SzType = SzType,
+  U extends SzType = SzType,
+> = SzPipe<T, U> & {
+  truthy: string[];
+  falsy: string[];
+};
 
 export type SzCodecBase<
   T extends SzType = SzType,

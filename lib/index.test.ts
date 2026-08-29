@@ -120,6 +120,19 @@ test.each([
       type: "number",
     },
   }),
+  p(z.object({ name: z.string(), age: z.number() }).exactPartial(), {
+    properties: {
+      age: {
+        isOptional: true,
+        type: "number",
+      },
+      name: {
+        isOptional: true,
+        type: "string",
+      },
+    },
+    type: "object",
+  }),
   p(z.string(), { type: "string" }),
   p(z.string({ error: "Not a string" }), {
     type: "string",
@@ -241,6 +254,11 @@ test.each([
   p(z.emoji(), { type: "string", kind: "emoji" }),
   p(z.uuid(), { type: "string", kind: "uuid" }),
   p(z.nanoid(), { type: "string", kind: "nanoid" }),
+  p(z.nanoid({ length: 64 }), {
+    type: "string",
+    kind: "nanoid",
+    length: 64,
+  }),
   p(z.cuid(), { type: "string", kind: "cuid" }),
   p(z.cuid2(), { type: "string", kind: "cuid2" }),
   p(z.ulid(), { type: "string", kind: "ulid" }),
@@ -492,6 +510,14 @@ test.each([
     rest: {
       type: "bigInt",
     },
+  }),
+
+  p(z.tuple([z.string(), z.number()]).partial(), {
+    type: "tuple",
+    items: [
+      { type: "string", isOptional: true },
+      { type: "number", isOptional: true },
+    ],
   }),
 
   p(z.set(z.string()), { type: "set", value: { type: "string" } }),
@@ -920,19 +946,28 @@ test("discriminated union", () => {
   expect(parsed.success).to.equal(true);
 });
 
-// Can't seem to detect type to implement stringbool
-// test("stringbool", () => {
-//   const schema = z.stringbool();
-//   expect(schema.parse("yes")).toEqual(true);
-//   const shape = zerialize(schema);
-//   expect(shape).toEqual({
-//     type: "boolean"
-//   });
-//   expect(dezerialize(shape as SzDocument).parse("yes")).toEqual(true);
+test("stringbool", () => {
+  const schema = z.stringbool();
+  expect(schema.parse("yes")).toEqual(true);
+  const shape = zerialize(schema);
+  expect(shape).toEqual({
+    type: "pipe",
+    $zodexySchema,
+    inner: {
+      type: "string",
+    },
+    outer: {
+      type: "boolean",
+    },
+    case: "insensitive",
+    falsy: ["false", "0", "no", "off", "n", "disabled"],
+    truthy: ["true", "1", "yes", "on", "y", "enabled"],
+  });
+  expect(dezerialize(shape as SzDocument).parse("yes")).toEqual(true);
 
-//   const parsed = zodexySchema.safeParse(shape);
-//   expect(parsed.success).to.equal(true);
-// });
+  const parsed = zodexySchema.safeParse(shape);
+  expect(parsed.success).to.equal(true);
+});
 
 test("coerce (number)", () => {
   const schema = z.coerce.number();
@@ -2249,4 +2284,93 @@ test("applies named checks to any schemas", () => {
   expect(schema.safeParse(Symbol("abc")).success).toBe(true);
   expect(schema.safeParse("abc").success).toBe(false);
   expect(calls).toBe(2);
+});
+
+test("Handles circular objects", () => {
+  const expectedShape = {
+    type: "object",
+    properties: { id: { type: "number" }, self: { $ref: "#" } },
+    $zodexySchema,
+  };
+
+  const Node = z.object({
+    id: z.number(),
+    get self() {
+      return Node;
+    },
+  });
+
+  const input: any = { id: 1 };
+  input.self = input;
+
+  /* const out = */ Node.parse(input);
+
+  const serialized = zerialize(Node as any);
+  expect(serialized).toEqual(expectedShape);
+
+  const dezSchema = dezerialize(serialized);
+  const rezer = zerialize(dezSchema as any);
+  expect(rezer).toEqual(expectedShape);
+});
+
+test("symbol keys", () => {
+  const TAG = Symbol("tag");
+  const TAG2 = Symbol("tag2");
+
+  const schema = z.object({
+    name: z.string(),
+    [TAG]: z.number(),
+    [TAG2]: z.boolean(),
+    nested: z.object({
+      [TAG]: z.bigint(),
+    }),
+  });
+
+  const expectedShape = {
+    $zodexySchema,
+    properties: {
+      name: {
+        type: "string",
+      },
+      nested: {
+        type: "object",
+        properties: {},
+        symbols: {
+          0: {
+            type: "bigInt",
+          },
+        },
+      },
+    },
+    symbols: {
+      0: {
+        type: "number",
+      },
+      1: {
+        type: "boolean",
+      },
+    },
+    type: "object",
+  };
+
+  const symbols = [TAG, TAG2];
+
+  const serialized = zerialize(schema as any, {
+    symbols,
+  });
+  expect(serialized).toEqual(expectedShape);
+
+  const dezSchema = dezerialize(serialized, {
+    symbols,
+  });
+  const rezer = zerialize(dezSchema as any, {
+    symbols,
+  });
+  expect(rezer).toEqual(expectedShape);
+
+  const parsed = zodexySchema.safeParse(serialized);
+  if (!parsed.success) {
+    console.log(parsed);
+  }
+  expect(parsed.success).to.equal(true);
 });

@@ -10,7 +10,7 @@ export default defineConfig(
   {
     ignores: [
       "lib/schema.zodexy.json",
-      "demo/vendor",
+      "demo/public/vendor",
       "**/dist/",
       ".idea",
       "coverage",
