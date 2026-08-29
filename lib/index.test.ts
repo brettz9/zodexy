@@ -18,7 +18,7 @@ import {
   Zerialize,
 } from "./index.js";
 
-const $zodexySchema = "https://github.com/brettz9/zodexy/releases/tag/v0.27.0";
+const $zodexySchema = "https://github.com/brettz9/zodexy/releases/tag/v0.29.0";
 
 const zodexySchemaJSON = JSON.parse(
   fs.readFileSync("./schema.zodexy.json", "utf-8"),
