@@ -306,7 +306,7 @@ const getCustomChecksAndErrors = (
       })
       .map((check) => {
         const name = Object.entries(
-          /* c8 ignore next -- TS doesn't catch */
+          /* v8 ignore next -- TS doesn't catch */
           opts.checks || {},
         ).find(([, checkFunc]) => {
           return checkFunc === (check as z.core.$ZodCustom)._zod.check;
@@ -398,7 +398,7 @@ const zerializers = {
               ? {
                   multipleOf: (check as z.core.$ZodCheckMultipleOf<number>)._zod
                     .def.value,
-                  /* c8 ignore next 2 -- Guard */
+                  /* v8 ignore next 2 -- Guard */
                 }
               : {}),
       };
@@ -491,7 +491,7 @@ const zerializers = {
                                         ._zod.def.pattern.flags,
                                     }
                                   : {}),
-                                /* c8 ignore next 2 -- Guard */
+                                /* v8 ignore next 2 -- Guard */
                               }
                             : {}),
       };
@@ -603,7 +603,7 @@ const zerializers = {
                     (check as z.core.$ZodCheckMultipleOf<bigint>)._zod.def
                       .value,
                   ),
-                  /* c8 ignore next 2 -- Guard */
+                  /* v8 ignore next 2 -- Guard */
                 }
               : {}),
       };
@@ -637,7 +637,7 @@ const zerializers = {
             : chk == "mime_type"
               ? {
                   mime: (check as z.core.$ZodCheckMimeType<File>)._zod.def.mime,
-                  /* c8 ignore next 2 -- Guard */
+                  /* v8 ignore next 2 -- Guard */
                 }
               : {}),
       };
@@ -671,7 +671,7 @@ const zerializers = {
                 //   ? { maxInclusive: true }
                 //   : {}),
               }
-            : /* c8 ignore next -- Guard */
+            : /* v8 ignore next -- Guard */
               {}),
       };
     }, {});
@@ -726,7 +726,7 @@ const zerializers = {
               ? {
                   minSize: (check as z.core.$ZodCheckSizeEquals)._zod.def.size,
                   maxSize: (check as z.core.$ZodCheckSizeEquals)._zod.def.size,
-                  /* c8 ignore next 2 -- Guard */
+                  /* v8 ignore next 2 -- Guard */
                 }
               : {}),
       };
@@ -759,7 +759,7 @@ const zerializers = {
                     .length,
                   maxLength: (check as z.core.$ZodCheckLengthEquals)._zod.def
                     .length,
-                  /* c8 ignore next 2 -- Guard */
+                  /* v8 ignore next 2 -- Guard */
                 }
               : {}),
       };
@@ -801,7 +801,7 @@ const zerializers = {
                 const index = opts.symbols.indexOf(symbol);
                 if (index === -1) {
                   throw new Error(
-                    "Symbol key and `symbols` option both present but not key found",
+                    "Symbol key and `symbols` option both present but key not found",
                   );
                 }
                 return [
@@ -856,7 +856,7 @@ const zerializers = {
               ? {
                   max: (check as z.core.$ZodCheckMaxSize)._zod.def.maximum,
                 }
-              : /* c8 ignore next -- Guard */
+              : /* v8 ignore next -- Guard */
                 {}),
       };
     }, {});
@@ -935,14 +935,14 @@ const zerializers = {
   },
   transform: (def, opts) => {
     let name = null;
-    if (opts.transforms) {
-      for (const [transformName, transformItem] of Object.entries(
-        opts.transforms,
-      )) {
-        if (def.type === "transform" && transformItem === def.transform) {
-          name = transformName;
-          break;
-        }
+
+    for (const [transformName, transformItem] of Object.entries(
+      // v8 ignore next -- Guard
+      opts.transforms ?? {},
+    )) {
+      if (def.type === "transform" && transformItem === def.transform) {
+        name = transformName;
+        break;
       }
     }
 
@@ -1011,7 +1011,7 @@ const zerializers = {
       value: null,
       issues: [],
       // No errors to report, so just add an empty set
-      /* c8 ignore next 3 -- Unused */
+      /* v8 ignore next 3 -- Unused */
       get error() {
         return new z.ZodError([]);
       },

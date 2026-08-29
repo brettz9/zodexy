@@ -14,6 +14,14 @@ export default defineConfig({
         "infer.ts",
         "zod-types.ts",
       ],
+      thresholds: {
+        autoUpdate: true,
+        lines: 100,
+        statements: 99.61,
+        functions: 98.03,
+        branches: 97.6,
+        perFile: true,
+      },
     },
     reporters: [
       [

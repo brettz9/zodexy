@@ -358,7 +358,7 @@ const dezerializers = {
           "pattern" in shape && shape.pattern
             ? z.email({
                 pattern: new RegExp(shape.pattern, shape.flags),
-                /* c8 ignore next -- Guard */
+                /* v8 ignore next -- Guard */
               })
             : z.email();
       } else if (shape.kind === "nanoid") {
@@ -467,7 +467,7 @@ const dezerializers = {
           // We cast to the expected type since we know the runtime behavior is correct.
           return schema as z.core.$ZodTemplateLiteralPart;
         }),
-        /* c8 ignore next 2 -- TS */
+        /* v8 ignore next 2 -- TS */
         typeof error === "string"
           ? error
           : {
@@ -800,6 +800,7 @@ const dezerializers = {
     const error = getError(shape, opts);
     return z.instanceof(
       Constructor,
+      // v8 ignore next -- Appears to always return an object if pressent
       typeof error === "string" ? { error } : error,
     );
   },
@@ -879,10 +880,10 @@ export function dezerializeRefs(
     return result;
   }
 
-  if ("meta" in shape) {
+  if ("meta" in shape && shape.meta) {
     const { meta, ...rest } = shape;
     const inner = d(rest, opts);
-    const result = meta ? inner.meta(meta) : inner;
+    const result = inner.meta(meta);
     opts.pathToSchema.set(opts.path, result);
     return result;
   }
@@ -893,7 +894,7 @@ export function dezerializeRefs(
 function resolvePointer(obj: any, pointer: string): any {
   const tokens = pointer.split("/").slice(1);
   return tokens.reduce((acc, token) => {
-    /* c8 ignore next -- Guard */
+    /* v8 ignore next -- Guard */
     if (acc === undefined) return acc;
     return acc[token.replace(/~1/g, "/").replace(/~0/g, "~")];
   }, obj);

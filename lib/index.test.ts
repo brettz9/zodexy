@@ -886,6 +886,16 @@ test("custom checks on supported special types", () => {
   expect(zerialize(dezerialize(instanceShape, options), options)).toEqual(
     instanceShape,
   );
+
+  const instanceShape2 = {
+    $zodexySchema,
+    type: "instanceof",
+    name: "Date",
+    error: "customError",
+  } as const;
+
+  const instanceSchema2 = z.instanceof(Date, { error: "customError" });
+  expect(zerialize(instanceSchema2, options)).toEqual(instanceShape2);
 });
 
 test("discriminated union", () => {
@@ -1293,7 +1303,7 @@ test("named checks and transforms", () => {
         });
       }
     },
-    /* c8 ignore next -- Unused */
+    /* v8 ignore next -- Unused */
     BCE: (arg: Date) => arg < new Date("0001-01-01"),
   };
 
@@ -1359,7 +1369,7 @@ test("named checks and transforms", () => {
 
 test("dezerialize checks without options", () => {
   const checks = {
-    /* c8 ignore next 11 -- Unused */
+    /* v8 ignore next 11 -- Unused */
     "not in future": (ctx: z.core.ParsePayload<Date>) => {
       if (ctx.value > new Date()) {
         ctx.issues.push({
@@ -2367,12 +2377,34 @@ test("symbol keys", () => {
     type: "object",
   };
 
+  expect(() => zerialize(schema)).toThrow(
+    "Symbol key present without `symbols` option",
+  );
+
+  expect(() =>
+    zerialize(schema, {
+      symbols: [Symbol("differentOne")],
+    }),
+  ).toThrow("Symbol key and `symbols` option both present but key not found");
+
   const symbols = [TAG, TAG2];
 
   const serialized = zerialize(schema as any, {
     symbols,
   });
   expect(serialized).toEqual(expectedShape);
+
+  expect(() => dezerialize(serialized)).toThrow(
+    "A symbol key was specified, but no `symbols` option was found",
+  );
+
+  expect(() =>
+    dezerialize(serialized, {
+      symbols: [Symbol("differentOne")],
+    }),
+  ).toThrow(
+    "A symbol key was specified and a `symbols` option was found, but not at the specified index.",
+  );
 
   const dezSchema = dezerialize(serialized, {
     symbols,
