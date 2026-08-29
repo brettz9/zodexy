@@ -207,6 +207,7 @@
                     "url": "url",
                     "emoji": "emoji",
                     "e164": "e164",
+                    "credit_card": "credit_card",
                     "cuid": "cuid",
                     "cuid2": "cuid2",
                     "ulid": "ulid",

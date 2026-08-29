@@ -49,6 +49,7 @@ export const STRING_KINDS = new Set([
   "json_string",
   "e164",
   "jwt",
+  "credit_card",
 
   "ipv4",
   "ipv6",

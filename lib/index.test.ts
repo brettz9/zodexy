@@ -18,7 +18,7 @@ import {
   Zerialize,
 } from "./index.js";
 
-const $zodexySchema = "https://github.com/brettz9/zodexy/releases/tag/v0.29.0";
+import $zodexySchema from "./zodexySchema.js";
 
 const zodexySchemaJSON = JSON.parse(
   fs.readFileSync("./schema.zodexy.json", "utf-8"),
@@ -133,6 +133,19 @@ test.each([
     },
     type: "object",
   }),
+  p(z.deepPartial(z.object({ name: z.string(), age: z.number() })), {
+    properties: {
+      age: {
+        isOptional: true,
+        type: "number",
+      },
+      name: {
+        isOptional: true,
+        type: "string",
+      },
+    },
+    type: "object",
+  }),
   p(z.string(), { type: "string" }),
   p(z.string({ error: "Not a string" }), {
     type: "string",
@@ -166,6 +179,7 @@ test.each([
   p(z.string().toUpperCase(), { type: "string", toUpperCase: true }),
   p(z.string().trim(), { type: "string", trim: true }),
 
+  p(z.creditCard(), { type: "string", kind: "credit_card" }),
   p(z.uuidv4(), { type: "string", kind: "uuid", version: "v4" }),
   p(z.uuidv7(), { type: "string", kind: "uuid", version: "v7" }),
   p(z.ipv4(), { type: "string", kind: "ip", version: "v4" }),

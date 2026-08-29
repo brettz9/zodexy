@@ -36,6 +36,7 @@ import {
   InstanceConstructor,
 } from "./types.js";
 import { ZodTypes, ZTypeName } from "./zod-types.js";
+import $zodexySchema from "./zodexySchema.js";
 
 export const PRIMITIVES = {
   ZodString: "string",
@@ -497,6 +498,7 @@ const zerializers = {
     }, {});
 
     const format = "format" in def && def.format;
+
     return Object.assign(
       {
         type: "string",
@@ -1121,8 +1123,7 @@ export function zerialize<T extends ZodTypes>(
       zerialized.$zodexySchema = opts.schema;
     }
   } else {
-    zerialized.$zodexySchema =
-      "https://github.com/brettz9/zodexy/releases/tag/v0.27.0";
+    zerialized.$zodexySchema = $zodexySchema;
   }
 
   return zerialized;
