@@ -92,7 +92,7 @@ unsupported-schema diagnostic when schema enforcement is enabled.
 ## Options
 
 Both `zerialize` and `dezerialize` accept an options object with the
-same `errors`, `checks`, `transforms`, `codecs`, and `instances` properties.
+same `errors`, `checks`, `transforms`, `codecs`, `instances`, and `symbols` properties.
 
 Since Zod does not allow the specification of the names of errors, checks and
 transforms (and preprocesses), we allow you to supply
@@ -100,7 +100,7 @@ as options maps of names to errors/checks/transforms so that these can be part
 of serialization and deserialization. If none of these options are
 supplied, the errors/checks/transforms will be omitted.
 
-Properties:
+Shared properties:
 
 - `errors` - Map of name to `.someType({error: fn})` functions
 - `checks` - Map of name to `.checks()` functions
@@ -109,6 +109,20 @@ Properties:
   `z.codec()`
 - `instances` - Map of name to constructors used to serialize and restore
   `z.instanceof()` schemas
+- `symbols` - Array of symbols used as keys
+
+Properties for `zerialize` only:
+
+- schema: A string representing the URL of the schema
+- currentPath: An array of strings
+- seenObjects: A map of ZodTypes to string
+
+Properties for `dezerialize` only:
+
+- path: A string
+- pathToSchema: A Map of string to ZodTypes
+- $refs: An array of tuples of `ZodLazy<any>` and string
+- originalShape: A `SzDocument` object
 
 Codec implementations remain consumer-owned and are matched by function
 identity during serialization:

@@ -268,8 +268,8 @@ type ZerializerOptions = {
   transforms?: {
     [key: string]: (ctx: z.core.ParsePayload) => Promise<unknown> | unknown;
   };
-  symbols?: symbol[];
   codecs?: Record<string, CodecFunctions>;
+  symbols?: symbol[];
   instances?: Record<string, InstanceConstructor>;
   schema?: string | null;
   currentPath: string[];
