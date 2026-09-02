@@ -1,5 +1,9 @@
 # CHANGES for zodexy
 
+## 0.27.1
+
+- fix: use new `meta.title` over `description` for short annotations in own schema
+
 ## 0.27.0
 
 - feat: accept `schema` string on `zerialize` to build new `$zodexySchema` property
