@@ -158,8 +158,8 @@ importers:
         specifier: ^19.3.0
         version: 19.3.0(react@19.3.0)
       zod:
-        specifier: ^4.6.0
-        version: 4.6.0
+        specifier: ^4.6.1
+        version: 4.6.1
       zodexy:
         specifier: workspace:*
         version: link:../lib
@@ -192,8 +192,8 @@ importers:
         specifier: ^4.41.0
         version: 4.41.0
       zod:
-        specifier: ^4.6.0
-        version: 4.6.0
+        specifier: ^4.6.1
+        version: 4.6.1
     devDependencies:
       '@vitest/coverage-v8':
         specifier: ^5.0.0
@@ -2128,8 +2128,8 @@ packages:
   zod@4.3.6:
     resolution: {integrity: sha512-rftlrkhHZOcjDwkGlnUtZZkvaPHCsDATp4pGpuOOMDaTdDDXF91wuVDJoWoPsKX/3YPQ5fHuF3STjcYyKr+Qhg==}
 
-  zod@4.6.0:
-    resolution: {integrity: sha512-iIvwyDnebKYpww2ta0DjaNOL8RnVLmPMhgWyOzlW9y0EIIxv5gl+H6Y0ONpt83HqjGqkk78uWp6xWtpxzZdPbw==}
+  zod@4.6.1:
+    resolution: {integrity: sha512-341aRWQsve0rvronKNTqZpjmzdbUDlFuzHaI/XLg/Ej82qffDJRRfBTCuv7+9q/rMjB6LSLyEBnW4InJeMtt/Q==}
 
 snapshots:
 
@@ -3839,4 +3839,4 @@ snapshots:
 
   zod@4.3.6: {}
 
-  zod@4.6.0: {}
+  zod@4.6.1: {}

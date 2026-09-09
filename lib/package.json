@@ -33,7 +33,7 @@
   },
   "dependencies": {
     "type-fest": "^4.41.0",
-    "zod": "^4.6.0"
+    "zod": "^4.6.1"
   },
   "devDependencies": {
     "@vitest/coverage-v8": "^5.0.0",

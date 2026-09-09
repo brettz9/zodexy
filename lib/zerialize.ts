@@ -1055,11 +1055,11 @@ const zerializers = {
       | undefined;
     if (!Constructor) {
       // No bag.Class when `properties()` available in Zod
-
+      //
       // if (schema instanceof z.ZodInstanceOf &&
       //   (schema.def.checks?.[0] ?? {}) instanceof z.ZodProperties
       // ) {
-      //   console.log('aaa', schema.def.checks[0]);
+      //   console.log('aaa', schema._zod.bag);
 
       //   return {
       //     type: "instanceof",
