@@ -41,7 +41,8 @@ export type ListCollections =
 export type KVCollections =
   | z.ZodObject<any>
   | z.ZodRecord<any, SomeType>
-  | z.ZodMap<SomeType, SomeType>;
+  | z.ZodMap<SomeType, SomeType>
+  | z.ZodProperties<any>;
 
 export type ADTs =
   | z.ZodUnion<readonly [SomeType, ...SomeType[]]>

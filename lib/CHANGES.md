@@ -1,5 +1,22 @@
 # CHANGES for zodexy
 
+## 0.31.0
+
+- feat: add support for serialization of `ZodProperties` (though not working with `instanceof`)
+- feat: add `iban` string kind
+
+## 0.30.1
+
+- fix: use new `meta.title` over `description` for short annotations in own schema
+
+## 0.30.0
+
+- feat: support `credit_card`
+
+## 0.29.0
+
+- feat: support Zod 4.5.x (jwt+algorithm, nanoid (kind, length), symbols, stringbool)
+
 ## 0.27.1
 
 - fix: use new `meta.title` over `description` for short annotations in own schema
