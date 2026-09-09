@@ -180,6 +180,7 @@ test.each([
   p(z.string().trim(), { type: "string", trim: true }),
 
   p(z.creditCard(), { type: "string", kind: "credit_card" }),
+  p(z.iban(), { type: "string", kind: "iban" }),
   p(z.uuidv4(), { type: "string", kind: "uuid", version: "v4" }),
   p(z.uuidv7(), { type: "string", kind: "uuid", version: "v7" }),
   p(z.ipv4(), { type: "string", kind: "ip", version: "v4" }),

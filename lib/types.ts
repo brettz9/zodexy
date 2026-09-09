@@ -50,6 +50,7 @@ export const STRING_KINDS = new Set([
   "e164",
   "jwt",
   "credit_card",
+  "iban",
 
   "ipv4",
   "ipv6",

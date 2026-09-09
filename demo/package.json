@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "predev": "pnpm copy",
+    "predev": "pnpm build-lib && pnpm copy",
     "dev": "vite",
     "tsc": "tsc",
     "copy": "rm -Rf public/vendor && mkdir -p public/vendor/@webcoder49/code-input && cp -R node_modules/prismjs/ public/vendor/prismjs/ && cp -R node_modules/@webcoder49/code-input/ public/vendor/@webcoder49/code-input/",
@@ -13,16 +13,16 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "react": "^19.2.8",
-    "react-dom": "^19.2.8",
-    "zod": "^4.5.4",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
+    "zod": "^4.6.0",
     "zodexy": "workspace:*"
   },
   "devDependencies": {
-    "@types/react": "^19.2.18",
-    "@types/react-dom": "^19.2.5",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
     "@vitejs/plugin-react": "^6.1.1",
-    "@webcoder49/code-input": "^2.8.3",
+    "@webcoder49/code-input": "^2.8.4",
     "prismjs": "^1.30.0",
     "typescript": "^6.0.3",
     "vite": "^8.2.2"

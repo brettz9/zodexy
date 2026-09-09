@@ -1,18 +1,20 @@
-import { defineConfig } from "vitest/config";
+import { defineConfig, configDefaults } from "vitest/config";
 
 export default defineConfig({
   test: {
+    exclude: [...configDefaults.exclude, "**/dist/**"],
     coverage: {
       exclude: [
         ".idea",
-        "dist",
+        "**/dist/**",
         "*.config.js",
         "*.config.ts",
         "*.cjs",
         "*.js",
-        "node_modules",
+        "**/node_modules/**",
         "infer.ts",
         "zod-types.ts",
+        "zodexySchema.ts",
       ],
       thresholds: {
         autoUpdate: true,
