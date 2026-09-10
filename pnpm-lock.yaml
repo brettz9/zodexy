@@ -137,8 +137,8 @@ importers:
         specifier: 9.1.7
         version: 9.1.7
       lint-staged:
-        specifier: 17.5.0
-        version: 17.5.0
+        specifier: 17.5.1
+        version: 17.5.1
       prettier:
         specifier: 3.8.3
         version: 3.8.3
@@ -158,8 +158,8 @@ importers:
         specifier: ^19.3.0
         version: 19.3.0(react@19.3.0)
       zod:
-        specifier: ^4.6.1
-        version: 4.6.1
+        specifier: ^4.6.2
+        version: 4.6.2
       zodexy:
         specifier: workspace:*
         version: link:../lib
@@ -172,7 +172,7 @@ importers:
         version: 19.3.0(@types/react@19.3.0)
       '@vitejs/plugin-react':
         specifier: ^6.1.1
-        version: 6.1.1(vite@8.2.2(@types/node@24.10.1)(esbuild@0.27.0)(jiti@2.4.2)(yaml@2.9.0))
+        version: 6.1.1(vite@8.3.0(@types/node@24.10.1)(esbuild@0.27.0)(jiti@2.4.2)(yaml@2.9.0))
       '@webcoder49/code-input':
         specifier: ^2.8.4
         version: 2.8.4
@@ -183,8 +183,8 @@ importers:
         specifier: ^6.0.3
         version: 6.0.3
       vite:
-        specifier: ^8.2.2
-        version: 8.2.2(@types/node@24.10.1)(esbuild@0.27.0)(jiti@2.4.2)(yaml@2.9.0)
+        specifier: ^8.3.0
+        version: 8.3.0(@types/node@24.10.1)(esbuild@0.27.0)(jiti@2.4.2)(yaml@2.9.0)
 
   lib:
     dependencies:
@@ -192,8 +192,8 @@ importers:
         specifier: ^4.41.0
         version: 4.41.0
       zod:
-        specifier: ^4.6.1
-        version: 4.6.1
+        specifier: ^4.6.2
+        version: 4.6.2
     devDependencies:
       '@vitest/coverage-v8':
         specifier: ^5.0.0
@@ -209,7 +209,7 @@ importers:
         version: 6.0.3
       vitest:
         specifier: 5.0.0
-        version: 5.0.0(@types/node@24.10.1)(@vitest/coverage-v8@5.0.0)(vite@8.2.2(@types/node@24.10.1)(esbuild@0.27.0)(jiti@2.4.2)(yaml@2.9.0))
+        version: 5.0.0(@types/node@24.10.1)(@vitest/coverage-v8@5.0.0)(vite@8.3.0(@types/node@24.10.1)(esbuild@0.27.0)(jiti@2.4.2)(yaml@2.9.0))
 
 packages:
 
@@ -1604,8 +1604,8 @@ packages:
   lines-and-columns@1.2.4:
     resolution: {integrity: sha512-7ylylesZQ/PV29jhEDl3Ufjo6ZX7gCqJr5F7PKrqc93v7fzSymt1BpwEU8nAUXs8qzzvqhbjhK5QZg6Mt/HkBg==}
 
-  lint-staged@17.5.0:
-    resolution: {integrity: sha512-ah2qsNtvKP1+Ak4rAvEEIvcXDLjjbr/xmxCvlequxqEOFYk0qINcZcRxD3Ic8wRn7/oQ8+wC9s0DfDrdMVCRFg==}
+  lint-staged@17.5.1:
+    resolution: {integrity: sha512-7EDuco1xnBMeVpvAbeMq1U5KXwJGLmY8q6l+Ye78r36C4mPc+Vg1Z2SK8gHyRTyvPro90A0q5/FAZ+Au23d6QQ==}
     engines: {node: '>=22.22.1'}
     hasBin: true
 
@@ -1744,6 +1744,10 @@ packages:
 
   postcss@8.5.26:
     resolution: {integrity: sha512-u82N74LFzG8ca+dD8puPnplTXoGH4fTPpVGuIbt36G3qvNlkvfD0lEAZSxaly3KX8TS/L1A1gsCEmvKmBcVbkQ==}
+    engines: {node: ^10 || ^12 || >=14}
+
+  postcss@8.5.28:
+    resolution: {integrity: sha512-RRuzqDtt5Y9h3quz5hWhK+TPnsmVs6WwSU6LkJMeY4HstUEDuYTG8UJSdawMRzmzAtV+KEoG8N3Qg2qLy5vM/A==}
     engines: {node: ^10 || ^12 || >=14}
 
   prelude-ls@1.2.1:
@@ -1985,13 +1989,13 @@ packages:
   uri-js@4.4.1:
     resolution: {integrity: sha512-7rKUyy33Q1yc98pQ1DAmLtwX109F7TIfWlW1Ydo8Wl1ii1SeHieeh0HHfPeL2fMXK6z0s8ecKs9frCuLJvndBg==}
 
-  vite@8.2.2:
-    resolution: {integrity: sha512-cFKLV/PRgAUlIRm5WjMjJ86jrftzpqcgH+Us+DS8mI3CDNiH30Whrz8uHL3+MOLPAgqbMBAqWdAHAphOAM+z/Q==}
+  vite@8.3.0:
+    resolution: {integrity: sha512-lhZBVvEHefgE+HQZC9O7EBJgCU/nVzFNl7vkS4RE0APtWLP02/8QVIkQtzBxPquh7lq5/78NHipTj7ODQ6XuyQ==}
     engines: {node: ^20.19.0 || >=22.12.0}
     hasBin: true
     peerDependencies:
       '@types/node': ^20.19.0 || >=22.12.0
-      '@vitejs/devtools': ^0.4.0 || ^0.5.0
+      '@vitejs/devtools': ^0.7.1
       esbuild: ^0.27.0 || ^0.28.0
       jiti: '>=1.21.0'
       less: ^4.0.0
@@ -2128,8 +2132,8 @@ packages:
   zod@4.3.6:
     resolution: {integrity: sha512-rftlrkhHZOcjDwkGlnUtZZkvaPHCsDATp4pGpuOOMDaTdDDXF91wuVDJoWoPsKX/3YPQ5fHuF3STjcYyKr+Qhg==}
 
-  zod@4.6.1:
-    resolution: {integrity: sha512-341aRWQsve0rvronKNTqZpjmzdbUDlFuzHaI/XLg/Ej82qffDJRRfBTCuv7+9q/rMjB6LSLyEBnW4InJeMtt/Q==}
+  zod@4.6.2:
+    resolution: {integrity: sha512-lh5RCAGFa1Cm2hjtNwLQhSs/AsqdWnTQaBER9fEwN/88pSh7KOtJavtBx/0VlkN/uFd61SwYmljLMDAsHlvzBQ==}
 
 snapshots:
 
@@ -2814,10 +2818,10 @@ snapshots:
       '@typescript-eslint/types': 8.70.0
       eslint-visitor-keys: 5.0.1
 
-  '@vitejs/plugin-react@6.1.1(vite@8.2.2(@types/node@24.10.1)(esbuild@0.27.0)(jiti@2.4.2)(yaml@2.9.0))':
+  '@vitejs/plugin-react@6.1.1(vite@8.3.0(@types/node@24.10.1)(esbuild@0.27.0)(jiti@2.4.2)(yaml@2.9.0))':
     dependencies:
       '@rolldown/pluginutils': 1.0.1
-      vite: 8.2.2(@types/node@24.10.1)(esbuild@0.27.0)(jiti@2.4.2)(yaml@2.9.0)
+      vite: 8.3.0(@types/node@24.10.1)(esbuild@0.27.0)(jiti@2.4.2)(yaml@2.9.0)
 
   '@vitest/coverage-v8@5.0.0(vitest@5.0.0)':
     dependencies:
@@ -2829,7 +2833,7 @@ snapshots:
       obug: 2.1.4
       std-env: 4.2.0
       tinyrainbow: 3.1.1
-      vitest: 5.0.0(@types/node@24.10.1)(@vitest/coverage-v8@5.0.0)(vite@8.2.2(@types/node@24.10.1)(esbuild@0.27.0)(jiti@2.4.2)(yaml@2.9.0))
+      vitest: 5.0.0(@types/node@24.10.1)(@vitest/coverage-v8@5.0.0)(vite@8.3.0(@types/node@24.10.1)(esbuild@0.27.0)(jiti@2.4.2)(yaml@2.9.0))
 
   '@vitest/istanbul-lib-coverage@1.0.1': {}
 
@@ -2837,14 +2841,14 @@ snapshots:
     dependencies:
       '@vitest/istanbul-lib-coverage': 1.0.1
 
-  '@vitest/mocker@5.0.0(vite@8.2.2(@types/node@24.10.1)(esbuild@0.27.0)(jiti@2.4.2)(yaml@2.9.0))':
+  '@vitest/mocker@5.0.0(vite@8.3.0(@types/node@24.10.1)(esbuild@0.27.0)(jiti@2.4.2)(yaml@2.9.0))':
     dependencies:
       '@jridgewell/trace-mapping': 0.3.31
       '@vitest/spy': 5.0.0
       estree-walker: 3.0.3
       magic-string: 1.2.3
     optionalDependencies:
-      vite: 8.2.2(@types/node@24.10.1)(esbuild@0.27.0)(jiti@2.4.2)(yaml@2.9.0)
+      vite: 8.3.0(@types/node@24.10.1)(esbuild@0.27.0)(jiti@2.4.2)(yaml@2.9.0)
 
   '@vitest/spy@5.0.0': {}
 
@@ -3367,7 +3371,7 @@ snapshots:
 
   lines-and-columns@1.2.4: {}
 
-  lint-staged@17.5.0:
+  lint-staged@17.5.1:
     dependencies:
       picomatch: 4.0.7
       string-argv: 0.3.2
@@ -3498,6 +3502,13 @@ snapshots:
       yaml: 2.9.0
 
   postcss@8.5.26:
+    dependencies:
+      nanoid: 3.3.18
+      picocolors: 1.1.1
+      source-map-js: 1.2.1
+    optional: true
+
+  postcss@8.5.28:
     dependencies:
       nanoid: 3.3.18
       picocolors: 1.1.1
@@ -3748,11 +3759,11 @@ snapshots:
     dependencies:
       punycode: 2.3.1
 
-  vite@8.2.2(@types/node@24.10.1)(esbuild@0.27.0)(jiti@2.4.2)(yaml@2.9.0):
+  vite@8.3.0(@types/node@24.10.1)(esbuild@0.27.0)(jiti@2.4.2)(yaml@2.9.0):
     dependencies:
       lightningcss: 1.33.0
       picomatch: 4.0.7
-      postcss: 8.5.26
+      postcss: 8.5.28
       rolldown: 1.2.6
       tinyglobby: 0.2.17
     optionalDependencies:
@@ -3762,10 +3773,10 @@ snapshots:
       jiti: 2.4.2
       yaml: 2.9.0
 
-  vitest@5.0.0(@types/node@24.10.1)(@vitest/coverage-v8@5.0.0)(vite@8.2.2(@types/node@24.10.1)(esbuild@0.27.0)(jiti@2.4.2)(yaml@2.9.0)):
+  vitest@5.0.0(@types/node@24.10.1)(@vitest/coverage-v8@5.0.0)(vite@8.3.0(@types/node@24.10.1)(esbuild@0.27.0)(jiti@2.4.2)(yaml@2.9.0)):
     dependencies:
       '@types/chai': 5.2.2
-      '@vitest/mocker': 5.0.0(vite@8.2.2(@types/node@24.10.1)(esbuild@0.27.0)(jiti@2.4.2)(yaml@2.9.0))
+      '@vitest/mocker': 5.0.0(vite@8.3.0(@types/node@24.10.1)(esbuild@0.27.0)(jiti@2.4.2)(yaml@2.9.0))
       chai: 6.2.2
       es-module-lexer: 2.3.2
       expect-type: 1.4.0
@@ -3776,7 +3787,7 @@ snapshots:
       tinybench: 6.1.4
       tinyexec: 1.3.0
       tinyglobby: 0.2.17
-      vite: 8.2.2(@types/node@24.10.1)(esbuild@0.27.0)(jiti@2.4.2)(yaml@2.9.0)
+      vite: 8.3.0(@types/node@24.10.1)(esbuild@0.27.0)(jiti@2.4.2)(yaml@2.9.0)
       why-is-node-running: 2.3.0
     optionalDependencies:
       '@types/node': 24.10.1
@@ -3839,4 +3850,4 @@ snapshots:
 
   zod@4.3.6: {}
 
-  zod@4.6.1: {}
+  zod@4.6.2: {}
