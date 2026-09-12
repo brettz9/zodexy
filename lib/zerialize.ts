@@ -6,7 +6,6 @@ import {
   SzLiteral,
   SzArray,
   SzObject,
-  SzProperties,
   SzUnion,
   SzDiscriminatedUnion,
   SzIntersection,
@@ -116,149 +115,142 @@ export type Zerialize<T extends ZodTypes> =
                                 ? Zerialize<Properties[Property]>
                                 : SzType;
                             }>
-                          : T extends z.ZodObject<infer Properties>
-                            ? SzProperties<{
-                                [Property in keyof Properties]: Properties[Property] extends ZodTypes
-                                  ? Zerialize<Properties[Property]>
-                                  : SzType;
-                              }>
-                            : T extends z.ZodRecord<
-                                  infer Key,
+                          : T extends z.ZodRecord<
+                                infer Key,
+                                infer Value extends SomeType
+                              >
+                            ? SzRecord<
+                                Key extends z.ZodString
+                                  ? SzString
+                                  : Key extends z.ZodNumber
+                                    ? SzNumber
+                                    : Key extends z.ZodSymbol
+                                      ? SzSymbol
+                                      : Key extends z.ZodLiteral<
+                                            infer L extends
+                                              | string
+                                              | number
+                                              | bigint
+                                              | boolean
+                                              | null
+                                              | undefined
+                                          >
+                                        ? SzLiteral<L>
+                                        : Key extends z.ZodEnum<infer E>
+                                          ? SzEnum<E>
+                                          : SzKey,
+                                Value extends ZodTypes
+                                  ? Zerialize<Value>
+                                  : SzType
+                              >
+                            : T extends z.ZodMap<
+                                  infer Key extends SomeType,
                                   infer Value extends SomeType
                                 >
-                              ? SzRecord<
-                                  Key extends z.ZodString
-                                    ? SzString
-                                    : Key extends z.ZodNumber
-                                      ? SzNumber
-                                      : Key extends z.ZodSymbol
-                                        ? SzSymbol
-                                        : Key extends z.ZodLiteral<
-                                              infer L extends
-                                                | string
-                                                | number
-                                                | bigint
-                                                | boolean
-                                                | null
-                                                | undefined
-                                            >
-                                          ? SzLiteral<L>
-                                          : Key extends z.ZodEnum<infer E>
-                                            ? SzEnum<E>
-                                            : SzKey,
+                              ? SzMap<
+                                  Key extends ZodTypes
+                                    ? Zerialize<Key>
+                                    : SzType,
                                   Value extends ZodTypes
                                     ? Zerialize<Value>
                                     : SzType
                                 >
-                              : T extends z.ZodMap<
-                                    infer Key extends SomeType,
-                                    infer Value extends SomeType
-                                  >
-                                ? SzMap<
-                                    Key extends ZodTypes
-                                      ? Zerialize<Key>
-                                      : SzType,
-                                    Value extends ZodTypes
-                                      ? Zerialize<Value>
-                                      : SzType
-                                  >
-                                : // Enums
-                                  T extends z.ZodEnum<infer Values>
-                                  ? SzEnum<Values>
-                                  : // Union/Intersection
-                                    T extends z.ZodUnion<infer Options>
-                                    ? {
-                                        [Index in keyof Options]: Options[Index] extends ZodTypes
-                                          ? Zerialize<Options[Index]>
-                                          : SzType;
-                                      } extends infer SzOptions extends [
-                                        SzType,
-                                        ...SzType[],
-                                      ]
-                                      ? SzUnion<SzOptions>
-                                      : SzType
-                                    : T extends z.ZodDiscriminatedUnion<
-                                          infer Options
+                              : // Enums
+                                T extends z.ZodEnum<infer Values>
+                                ? SzEnum<Values>
+                                : // Union/Intersection
+                                  T extends z.ZodUnion<infer Options>
+                                  ? {
+                                      [Index in keyof Options]: Options[Index] extends ZodTypes
+                                        ? Zerialize<Options[Index]>
+                                        : SzType;
+                                    } extends infer SzOptions extends [
+                                      SzType,
+                                      ...SzType[],
+                                    ]
+                                    ? SzUnion<SzOptions>
+                                    : SzType
+                                  : T extends z.ZodDiscriminatedUnion<
+                                        infer Options
+                                      >
+                                    ? T["_zod"]["def"]["discriminator"] extends infer Discriminator extends
+                                        string
+                                      ? SzDiscriminatedUnion<
+                                          Discriminator,
+                                          {
+                                            [Index in keyof Options]: Options[Index] extends ZodTypes
+                                              ? Zerialize<Options[Index]>
+                                              : SzType;
+                                          } extends infer O extends
+                                            readonly SzType[]
+                                            ? O
+                                            : never
                                         >
-                                      ? T["_zod"]["def"]["discriminator"] extends infer Discriminator extends
-                                          string
-                                        ? SzDiscriminatedUnion<
-                                            Discriminator,
-                                            {
-                                              [Index in keyof Options]: Options[Index] extends ZodTypes
-                                                ? Zerialize<Options[Index]>
-                                                : SzType;
-                                            } extends infer O extends
-                                              readonly SzType[]
-                                              ? O
-                                              : never
-                                          >
-                                        : SzType
-                                      : T extends z.ZodIntersection<
-                                            infer L extends SomeType,
-                                            infer R extends SomeType
-                                          >
-                                        ? SzIntersection<
-                                            L extends ZodTypes
-                                              ? Zerialize<L>
-                                              : SzType,
-                                            R extends ZodTypes
-                                              ? Zerialize<R>
-                                              : SzType
-                                          >
-                                        : T extends z.ZodXor<infer Options>
-                                          ? {
-                                              [Index in keyof Options]: Options[Index] extends ZodTypes
-                                                ? Zerialize<Options[Index]>
-                                                : SzType;
-                                            } extends infer SzOptions extends [
-                                              SzType,
-                                              ...SzType[],
-                                            ]
-                                            ? SzXor<SzOptions>
+                                      : SzType
+                                    : T extends z.ZodIntersection<
+                                          infer L extends SomeType,
+                                          infer R extends SomeType
+                                        >
+                                      ? SzIntersection<
+                                          L extends ZodTypes
+                                            ? Zerialize<L>
+                                            : SzType,
+                                          R extends ZodTypes
+                                            ? Zerialize<R>
                                             : SzType
-                                          : // Specials
-                                            T extends z.ZodCustom<any, any>
-                                            ? SzInstanceOf
-                                            : T extends z.ZodPromise<
-                                                  infer Value extends SomeType
+                                        >
+                                      : T extends z.ZodXor<infer Options>
+                                        ? {
+                                            [Index in keyof Options]: Options[Index] extends ZodTypes
+                                              ? Zerialize<Options[Index]>
+                                              : SzType;
+                                          } extends infer SzOptions extends [
+                                            SzType,
+                                            ...SzType[],
+                                          ]
+                                          ? SzXor<SzOptions>
+                                          : SzType
+                                        : // Specials
+                                          T extends z.ZodCustom<any, any>
+                                          ? SzInstanceOf
+                                          : T extends z.ZodPromise<
+                                                infer Value extends SomeType
+                                              >
+                                            ? SzPromise<
+                                                Value extends ZodTypes
+                                                  ? Zerialize<Value>
+                                                  : SzType
+                                              >
+                                            : T extends z.ZodCatch<
+                                                  infer T extends SomeType
                                                 >
-                                              ? SzPromise<
-                                                  Value extends ZodTypes
-                                                    ? Zerialize<Value>
-                                                    : SzType
-                                                >
-                                              : T extends z.ZodCatch<
-                                                    infer T extends SomeType
-                                                  >
-                                                ? SzCatch<
-                                                    T extends ZodTypes
-                                                      ? Zerialize<T>
-                                                      : SzType
-                                                  >
-                                                : // Unserializable types, fallback to serializing inner type
-                                                  T extends z.ZodLazy<
-                                                      infer T extends SomeType
-                                                    >
-                                                  ? T extends ZodTypes
+                                              ? SzCatch<
+                                                  T extends ZodTypes
                                                     ? Zerialize<T>
                                                     : SzType
-                                                  : T extends z.ZodPipe<
-                                                        infer _In,
-                                                        infer Out extends
+                                                >
+                                              : // Unserializable types, fallback to serializing inner type
+                                                T extends z.ZodLazy<
+                                                    infer T extends SomeType
+                                                  >
+                                                ? T extends ZodTypes
+                                                  ? Zerialize<T>
+                                                  : SzType
+                                                : T extends z.ZodPipe<
+                                                      infer _In,
+                                                      infer Out extends SomeType
+                                                    >
+                                                  ? Out extends ZodTypes
+                                                    ? Zerialize<Out>
+                                                    : SzType
+                                                  : T extends z.ZodCatch<
+                                                        infer Inner extends
                                                           SomeType
                                                       >
-                                                    ? Out extends ZodTypes
-                                                      ? Zerialize<Out>
+                                                    ? Inner extends ZodTypes
+                                                      ? Zerialize<Inner>
                                                       : SzType
-                                                    : T extends z.ZodCatch<
-                                                          infer Inner extends
-                                                            SomeType
-                                                        >
-                                                      ? Inner extends ZodTypes
-                                                        ? Zerialize<Inner>
-                                                        : SzType
-                                                      : SzType;
+                                                    : SzType;
 
 type ZodTypeMap = {
   [Key in ZTypeName<ZodTypes>]: Extract<
@@ -1037,18 +1029,6 @@ const zerializers = {
     ...s(def.innerType, opts, true),
     readonly: true,
   }),
-  properties: (def, opts) => ({
-    type: "properties",
-    properties: Object.fromEntries(
-      Object.entries(def.shape).map(([key, schema]) => [
-        key,
-        s(schema as ZodTypes, {
-          ...opts,
-          currentPath: [...opts.currentPath, "properties", key],
-        }),
-      ]),
-    ),
-  }),
   custom: (_def, opts, schema) => {
     const Constructor = schema._zod.bag.Class as
       | InstanceConstructor
@@ -1057,16 +1037,21 @@ const zerializers = {
       // No bag.Class when `properties()` available in Zod
       //
       // if (schema instanceof z.ZodInstanceOf &&
-      //   (schema.def.checks?.[0] ?? {}) instanceof z.ZodProperties
+      //   ((schema.def.checks?.[0] ?? {}) instanceof z.core.$ZodCheckProperties) &&
+      //   schema.def.fn.toString() === '(data) => data instanceof cls'
       // ) {
-      //   console.log('aaa', schema._zod.bag);
-
       //   return {
       //     type: "instanceof",
-      //     properties: s(schema.def.checks[0], {
-      //       ...opts,
-      //       currentPath: [...opts.currentPath, "properties"],
-      //     })
+      //     name: schema._zod.bag.Class,
+      //     properties: Object.fromEntries(
+      //       Object.entries(schema.def.checks?.[0]?._zod?.def?.shape ?? []).map(([key, schema]) => [
+      //         key,
+      //         s(schema as ZodTypes, {
+      //           ...opts,
+      //           currentPath: [...opts.currentPath, "properties", key],
+      //         }),
+      //       ])
+      //     ),
       //   } satisfies SzInstanceOf;
       // }
 

@@ -199,13 +199,6 @@ export type SzObject<
   U extends SzType = SzType,
 > = SzObjectBase<T, U> & SzExtras;
 
-export type SzProperties<
-  T extends Record<string, SzType> = Record<string, SzType>,
-> = {
-  type: "properties";
-  properties: T;
-} & SzExtras;
-
 export type SzUnionBase<Options extends [SzType, ...SzType[]] = [SzType]> = {
   type: "union";
   options: Options;
@@ -368,11 +361,17 @@ export type SzCodec<
   U extends SzType = SzType,
 > = SzCodecBase<T, U> & SzExtras;
 
-export type SzInstanceOfBase = {
+export type SzInstanceOfBase<
+  T extends Record<string, SzType> = Record<string, SzType>,
+> = {
   type: "instanceof";
   name: string;
+  properties?: T;
 };
-export type SzInstanceOf = SzInstanceOfBase & SzExtras;
+
+export type SzInstanceOf<
+  T extends Record<string, SzType> = Record<string, SzType>,
+> = SzInstanceOfBase<T> & SzExtras;
 
 export type InstanceConstructor = new (...args: any[]) => any;
 
@@ -434,7 +433,6 @@ export type SzType =
   | SzTemplateLiteral
   | SzArray<any>
   | SzObject<any, any>
-  | SzProperties<any>
   | SzUnion<any>
   | SzDiscriminatedUnion<any, any>
   | SzIntersection<any, any>
@@ -450,7 +448,7 @@ export type SzType =
   | SzCatch<any>
   | SzPipe<any, any>
   | SzCodec<any, any>
-  | SzInstanceOf
+  | SzInstanceOf<any>
   | SzTransform;
 
 export type SzDocument<T extends SzType = SzType> = T & {
@@ -485,6 +483,4 @@ export type SzUnionize<T extends SzType | SzRef> =
                             ? SzUnionize<Value>
                             : T extends SzCodec<infer Input, infer Output>
                               ? SzUnionize<Input | Output>
-                              : T extends SzProperties<infer Properties>
-                                ? SzUnionize<ValueOf<Properties>>
-                                : never);
+                              : never);

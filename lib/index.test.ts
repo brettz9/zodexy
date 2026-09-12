@@ -1166,38 +1166,6 @@ test.todo("instanceof with properties", () => {
   expect(zodexySchema.safeParse(expectedShape).success).toBe(true);
 });
 
-test("properties", () => {
-  const schema = z.properties({
-    protocol: z.literal("https:"),
-    hostname: z.string().regex(z.regexes.domain),
-  });
-  const expectedShape = {
-    $zodexySchema,
-    type: "properties",
-    properties: {
-      hostname: {
-        regex:
-          "^(?=.{1,253}$)([a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\\.)+[a-zA-Z]{2,63}$",
-        type: "string",
-      },
-      protocol: {
-        type: "literal",
-        values: ["https:"],
-      },
-    },
-  } as const;
-
-  const serialized = zerialize(schema);
-  expect(serialized).toEqual(expectedShape);
-
-  const restored = dezerialize(serialized);
-
-  expect(restored.safeParse(new URL("https://example.com")).success).toBe(true);
-  expect(restored.safeParse({}).success).toBe(false);
-  expect(zerialize(restored)).toEqual(expectedShape);
-  expect(zodexySchema.safeParse(expectedShape).success).toBe(true);
-});
-
 test("preprocess", () => {
   const transforms = {
     addFive: (val: any) => val + 5,

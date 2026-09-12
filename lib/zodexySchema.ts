@@ -1,1 +1,1 @@
-export default "https://github.com/brettz9/zodexy/releases/tag/v0.31.0";
+export default "https://github.com/brettz9/zodexy/releases/tag/v0.31.1";
