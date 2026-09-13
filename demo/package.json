@@ -15,7 +15,7 @@
   "dependencies": {
     "react": "^19.3.0",
     "react-dom": "^19.3.0",
-    "zod": "^4.6.3",
+    "zod": "^4.6.4",
     "zodexy": "workspace:*"
   },
   "devDependencies": {

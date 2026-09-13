@@ -179,6 +179,7 @@ test.each([
   p(z.string().toUpperCase(), { type: "string", toUpperCase: true }),
   p(z.string().trim(), { type: "string", trim: true }),
 
+  p(z.currencyCode(), { type: "string", kind: "currency_code" }),
   p(z.creditCard(), { type: "string", kind: "credit_card" }),
   p(z.iban(), { type: "string", kind: "iban" }),
   p(z.uuidv4(), { type: "string", kind: "uuid", version: "v4" }),

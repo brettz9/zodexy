@@ -365,6 +365,8 @@ const dezerializers = {
         s = "length" in shape ? z.nanoid({ length: shape.length }) : z.nanoid();
       } else if (shape.kind === "credit_card") {
         s = z.creditCard();
+      } else if (shape.kind === "currency_code") {
+        s = z.currencyCode();
       } else if (shape.kind !== "json_string") {
         // Todo: how to get `json_string`?
         s = z[shape.kind]();
