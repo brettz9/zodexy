@@ -177,7 +177,7 @@ export type SzPrimitive =
   | SzVoid
   | SzSymbol;
 
-export type SzLiteralBase<T> = { type: "literal"; values: T };
+export type SzLiteralBase<T> = { type: "literal"; values: T[] };
 export type SzLiteral<T> = SzLiteralBase<T> & SzExtras;
 export type SzArrayBase<T extends SzType = SzType> = {
   type: "array";

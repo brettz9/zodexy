@@ -36,12 +36,12 @@ const p = <
 test("standalone schema types include extras", () => {
   const literal: SzLiteral<"value"> = {
     type: "literal",
-    values: "value",
+    values: ["value"],
     description: "A literal value",
   };
   const literalBase: SzLiteralBase<"value"> = {
     type: "literal",
-    values: "value",
+    values: ["value"],
   };
 
   expect(literal.description).toBe("A literal value");
