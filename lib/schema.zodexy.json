@@ -621,9 +621,6 @@
                       "type": "bigInt"
                     },
                     {
-                      "type": "boolean"
-                    },
-                    {
                       "type": "null"
                     },
                     {
