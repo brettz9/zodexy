@@ -332,6 +332,11 @@ test.each([
 
   p(z.string().optional(), { type: "string", isOptional: true }),
   p(z.string().nullable(), { type: "string", isNullable: true }),
+  p(z.string().nullish(), {
+    type: "string",
+    isNullable: true,
+    isOptional: true,
+  }),
 
   p(
     z.string().default(() => "foo"),
